@@ -442,7 +442,7 @@ ul, ol { list-style: none; padding: 0; }
   color: var(--accent);
   line-height: 1;
 }
-.stats strong::after { content: "+"; color: var(--accent-2); }
+.stats li.plus strong::after { content: "+"; color: var(--accent-2); }
 .stats span {
   font-size: 0.8rem;
   letter-spacing: 0.06em;
