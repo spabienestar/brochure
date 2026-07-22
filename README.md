@@ -6,7 +6,6 @@ Una misión clara: llevarte la experiencia completa de un spa directamente a la 
 
 Landing page estática (HTML + CSS + JS vanilla, sin build step) con los servicios del brochure: masajes de relajación, tratamientos faciales, programas spa y terapias post-quirúrgicas.
 
-- **Vista previa en línea:** https://bayronlondonoc.github.io/spa-medellin/
 - **Sitio oficial de este repositorio (pendiente de activación):** https://spabienestar.github.io/brochure/
 
 ### ⚠️ Para activar el sitio oficial (requiere el dueño del repositorio)

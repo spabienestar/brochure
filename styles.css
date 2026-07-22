@@ -821,6 +821,27 @@ ul, ol { list-style: none; padding: 0; }
   color: rgba(233, 229, 216, 0.75);
   max-width: 30ch;
 }
+.footer-social {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.3rem;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  border: 1px solid rgba(233, 229, 216, 0.28);
+  border-radius: 50%;
+  color: rgba(233, 229, 216, 0.85);
+  transition: background 0.35s var(--ease-out), color 0.35s var(--ease-out), border-color 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.footer-social a:hover {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: #fff;
+  transform: translateY(-2px);
+}
 .footer-col h4 {
   font-size: 0.75rem;
   font-weight: 600;
