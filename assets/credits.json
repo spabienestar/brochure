@@ -1,0 +1,68 @@
+{
+  "hero-masaje": {
+    "src": "assets/img/hero-masaje.jpg",
+    "title": "Massage",
+    "creator": "Collin Parker (Costculator)",
+    "creator_url": "https://www.flickr.com/photos/158282012@N07",
+    "license": "by",
+    "license_version": "2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "foreign_landing_url": "https://www.flickr.com/photos/158282012@N07/43781411011",
+    "source": "flickr"
+  },
+  "facial-mascarilla": {
+    "src": "assets/img/facial-mascarilla.jpg",
+    "title": "Facial",
+    "creator": "Zenspa1",
+    "creator_url": "https://www.flickr.com/photos/93609956@N05",
+    "license": "by",
+    "license_version": "2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "foreign_landing_url": "https://www.flickr.com/photos/93609956@N05/9865582355",
+    "source": "flickr"
+  },
+  "programa-vino": {
+    "src": "assets/img/programa-vino.jpg",
+    "title": "Cozy candlelit dinner for two",
+    "creator": "PattayaPatrol",
+    "creator_url": "https://www.flickr.com/people/PattayaPatrol",
+    "license": "by-sa",
+    "license_version": "4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "foreign_landing_url": "https://commons.wikimedia.org/w/index.php?curid=189034277",
+    "source": "wikimedia"
+  },
+  "programa-chocolate": {
+    "src": "assets/img/programa-chocolate.jpg",
+    "title": "Dipped fancy strawberries coated in chocolate",
+    "creator": "ProFlowers.com",
+    "creator_url": "https://www.flickr.com/photos/127365614@N08",
+    "license": "by",
+    "license_version": "2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "foreign_landing_url": "https://www.flickr.com/photos/127365614@N08/16741817556",
+    "source": "flickr"
+  },
+  "ritual-velas": {
+    "src": "assets/img/ritual-velas.jpg",
+    "title": "Spa con velas",
+    "creator": "Healthy Living (StockSnap)",
+    "creator_url": "https://stocksnap.io",
+    "license": "cc0",
+    "license_version": "1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "foreign_landing_url": "https://stocksnap.io/photo/flatlay-spa-2HEUUNACGX",
+    "source": "stocksnap"
+  },
+  "detalle-piedras": {
+    "src": "assets/img/detalle-piedras.jpg",
+    "title": "In The Rookery",
+    "creator": "Marathon",
+    "creator_url": "https://geograph.org.uk/profile/43806",
+    "license": "by-sa",
+    "license_version": "2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "foreign_landing_url": "https://www.geograph.org.uk/photo/2581117",
+    "source": "geographorguk"
+  }
+}
