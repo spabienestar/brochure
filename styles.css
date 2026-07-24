@@ -10,7 +10,7 @@
   --ink:       #2c2a22;
   --ink-soft:  #4b4839;
   --ink-mute:  #837e6c;
-  --accent:    #6b8457;   /* verde salvia profundo */
+  --accent:    #6f6b3f;   /* verde oliva (rama del logo) */
   --accent-2:  #b9924f;   /* dorado del logo */
   --line:      rgba(44, 42, 34, 0.14);
   --wa:        #25d366;
@@ -140,9 +140,9 @@ ul, ol { list-style: none; padding: 0; }
 .btn-primary {
   background: var(--accent);
   color: var(--paper);
-  box-shadow: 0 10px 24px rgba(107, 132, 87, 0.35);
+  box-shadow: 0 10px 24px rgba(111, 107, 63, 0.35);
 }
-.btn-primary:hover { background: #5c7449; box-shadow: 0 14px 30px rgba(107, 132, 87, 0.45); }
+.btn-primary:hover { background: #57532f; box-shadow: 0 14px 30px rgba(111, 107, 63, 0.45); }
 .btn-ghost {
   border: 1px solid var(--line);
   color: var(--ink-soft);
@@ -324,6 +324,14 @@ ul, ol { list-style: none; padding: 0; }
   max-width: 46ch;
   font-size: 1.02rem;
   color: var(--ink-soft);
+}
+.hero-tagline {
+  margin-top: 0.9rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--accent);
+  max-width: 42ch;
 }
 .hero-actions {
   display: flex;
@@ -801,6 +809,11 @@ ul, ol { list-style: none; padding: 0; }
   display: grid;
   gap: 2.5rem;
   padding-bottom: 3rem;
+}
+.footer-logo-mark {
+  width: 84px;
+  height: auto;
+  margin-bottom: 1rem;
 }
 .footer-logo {
   font-family: var(--serif);
