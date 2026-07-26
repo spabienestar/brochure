@@ -23,14 +23,14 @@
   },
   "programa-vino": {
     "src": "assets/img/programa-vino.jpg",
-    "title": "Cozy candlelit dinner for two",
-    "creator": "PattayaPatrol",
-    "creator_url": "https://www.flickr.com/people/PattayaPatrol",
-    "license": "by-sa",
-    "license_version": "4.0",
-    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "foreign_landing_url": "https://commons.wikimedia.org/w/index.php?curid=189034277",
-    "source": "wikimedia"
+    "title": "Flatlay Spa (piedras, orquídeas y velas)",
+    "creator": "Healthy Living",
+    "creator_url": "https://stocksnap.io",
+    "license": "cc0",
+    "license_version": "1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "foreign_landing_url": "https://www.rawpixel.com/image/5960654/free-public-domain-cc0-photo",
+    "source": "rawpixel"
   },
   "programa-chocolate": {
     "src": "assets/img/programa-chocolate.jpg",
