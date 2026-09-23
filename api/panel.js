@@ -188,7 +188,11 @@ module.exports = async function panel(req, res) {
   };
 
   const cfg = configuracion();
-  if (!cfg) return responder(503, { error: "El panel todavía no está configurado." });
+  if (!cfg) {
+    // Solo nombres (ya públicos en el README), nunca valores: sirve para diagnosticar la configuración.
+    const faltan = ["PANEL_USUARIO", "PANEL_CLAVE", "GITHUB_TOKEN"].filter((nombre) => !process.env[nombre]);
+    return responder(503, { error: "El panel todavía no está configurado.", faltan });
+  }
 
   const accion = new URL(req.url, "http://localhost").searchParams.get("accion") || "";
   try {
