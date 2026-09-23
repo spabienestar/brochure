@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel de tarifas · Olivé Spa</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500;600&display=swap" />
+  <style>
+    :root {
+      --bg: #f7f2e9;
+      --paper: #fffdf8;
+      --sage: #dde5cf;
+      --ink: #2c2a22;
+      --ink-soft: #4b4839;
+      --ink-mute: #837e6c;
+      --accent: #6f6b3f;
+      --accent-2: #b9924f;
+      --line: rgba(44, 42, 34, 0.14);
+      --error: #a8412f;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "Montserrat", "Segoe UI", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; cursor: pointer; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .shell { width: min(640px, 100%); margin-inline: auto; padding: 1.5rem 1rem 10rem; }
+    .brand { text-align: center; margin-bottom: 1.5rem; }
+    .brand-name { font-family: var(--serif); font-weight: 600; font-size: 2.2rem; line-height: 1; }
+    .brand-tag {
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 1.5rem 1.25rem;
+      box-shadow: 0 10px 30px -18px rgba(44, 42, 34, 0.35);
+    }
+    .cargando, .aviso { text-align: center; color: var(--ink-soft); }
+
+    /* ---------- Entrar ---------- */
+    .login { max-width: 400px; margin-inline: auto; display: grid; gap: 1rem; }
+    .login h1 { font-family: var(--serif); font-weight: 600; font-size: 1.7rem; }
+    .campo { display: grid; gap: 0.35rem; font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); }
+    .campo input, .clave {
+      width: 100%;
+      font: 400 1rem var(--sans);
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+    }
+    .clave { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.4rem 0 0; }
+    .clave input { flex: 1; border: 0; background: transparent; padding: 0.8rem 0.9rem; font: inherit; min-width: 0; }
+    .clave input:focus-visible { outline: none; }
+    .clave:focus-within, .campo > input:focus { border-color: var(--accent); outline: none; }
+    .ver-clave {
+      border: 0;
+      background: none;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.5rem;
+    }
+    .error { color: var(--error); font-size: 0.85rem; min-height: 1.3em; }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.85rem 1.4rem;
+      background: var(--accent);
+      color: var(--paper);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+    .btn-sec { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .link { border: 0; background: none; color: var(--accent); font-weight: 600; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ---------- Editor ---------- */
+    .intro { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; }
+    .intro p { font-size: 0.9rem; color: var(--ink-soft); }
+    .intro-acciones { display: grid; gap: 0.4rem; justify-items: end; flex-shrink: 0; }
+    .intro-acciones a { color: var(--accent); font-weight: 600; font-size: 0.85rem; }
+    .grupo { margin-bottom: 1.25rem; padding: 0; overflow: hidden; }
+    .grupo h2 {
+      padding: 0.9rem 1rem;
+      background: var(--sage);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .fila {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.2rem 0.9rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-top: 1px solid var(--line);
+      cursor: text;
+      transition: background 0.2s;
+    }
+    .grupo h2 + .fila { border-top: 0; }
+    .fila-texto { display: grid; gap: 0.1rem; min-width: 0; }
+    .fila-nombre { font-weight: 500; font-size: 0.92rem; }
+    .fila-detalle { font-size: 0.74rem; color: var(--ink-mute); }
+    .precio {
+      display: flex;
+      align-items: baseline;
+      gap: 0.15rem;
+      padding: 0.35rem 0.7rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    .precio:focus-within { border-color: var(--accent); }
+    .precio input {
+      width: 7.6ch;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      color: var(--ink);
+      text-align: right;
+      padding: 0;
+    }
+    .precio input:focus-visible { outline: none; }
+    .precio-nota { grid-column: 2; justify-self: end; font-size: 0.7rem; color: var(--ink-mute); }
+    .fila-antes { grid-column: 1 / -1; font-size: 0.74rem; color: var(--accent-2); font-weight: 500; }
+    .fila-antes:empty { display: none; }
+    .fila.cambiado { background: rgba(185, 146, 79, 0.1); }
+    .fila.cambiado .precio { border-color: var(--accent-2); }
+    .fila.invalido .precio { border-color: var(--error); }
+    .fila.invalido .fila-antes { color: var(--error); }
+
+    /* ---------- Barra inferior ---------- */
+    .barra {
+      position: fixed;
+      inset: auto 0 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem 0.75rem;
+      padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom));
+      background: rgba(255, 253, 248, 0.97);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -10px 30px -20px rgba(44, 42, 34, 0.4);
+    }
+    /* Si los botones no dejan espacio, el mensaje pasa a su propia línea. */
+    .barra-estado { flex: 1 1 9rem; font-size: 0.82rem; color: var(--ink-soft); }
+    .barra-estado.ok { color: var(--accent); font-weight: 600; }
+    .barra-estado.error { color: var(--error); font-weight: 600; }
+    .barra-acciones { flex: 1 1 auto; display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .barra .btn { padding: 0.75rem 1.1rem; font-size: 0.88rem; }
+
+    /* ---------- Confirmación ---------- */
+    .dialogo {
+      width: min(460px, calc(100% - 2rem));
+      margin: auto; /* el reset de márgenes quita el centrado nativo del <dialog> */
+      border: 0;
+      border-radius: 20px;
+      padding: 1.4rem 1.25rem;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .dialogo::backdrop { background: rgba(44, 42, 34, 0.5); }
+    .dialogo h2 { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; margin-bottom: 0.9rem; }
+    .resumen { list-style: none; padding: 0; display: grid; gap: 0.6rem; max-height: 50vh; overflow: auto; }
+    .resumen li { display: grid; gap: 0.1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); font-size: 0.88rem; }
+    .resumen s { color: var(--ink-mute); }
+    .resumen strong { color: var(--accent); }
+    .dialogo-acciones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.1rem; }
+
+    @media (min-width: 560px) {
+      .shell { padding-top: 2.5rem; }
+      .card { padding: 2rem 1.75rem; }
+      .grupo { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="brand">
+      <p class="brand-name">Olivé Spa</p>
+      <p class="brand-tag">Panel de tarifas</p>
+    </header>
+
+    <p class="cargando" data-vista="cargando">Cargando…</p>
+
+    <form class="card login" data-vista="login" data-login hidden novalidate>
+      <h1>Entrar</h1>
+      <label class="campo">Usuario
+        <input name="usuario" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" />
+      </label>
+      <label class="campo">Contraseña
+        <span class="clave">
+          <input name="clave" type="password" autocomplete="current-password" />
+          <button class="ver-clave" type="button" data-ver-clave aria-label="Mostrar contraseña">Ver</button>
+        </span>
+      </label>
+      <p class="error" role="alert" data-error-login></p>
+      <button class="btn" type="submit" data-entrar>Entrar</button>
+    </form>
+
+    <div class="card aviso" data-vista="aviso" hidden>
+      <p data-aviso></p>
+    </div>
+
+    <section data-vista="editor" hidden>
+      <div class="intro">
+        <p>Cambia los precios y toca <strong>Guardar y publicar</strong>. La página se actualiza sola en 1 o 2 minutos.</p>
+        <div class="intro-acciones">
+          <a href="/" target="_blank" rel="noopener">Ver la página</a>
+          <button class="link" type="button" data-salir>Salir</button>
+        </div>
+      </div>
+      <div data-grupos></div>
+    </section>
+  </main>
+
+  <footer class="barra" data-barra hidden>
+    <p class="barra-estado" aria-live="polite" data-estado>Sin cambios</p>
+    <div class="barra-acciones">
+      <button class="btn btn-sec" type="button" data-deshacer hidden>Deshacer</button>
+      <button class="btn" type="button" data-guardar disabled>Guardar y publicar</button>
+    </div>
+  </footer>
+
+  <dialog class="dialogo" data-confirmar>
+    <h2>¿Publicar estos precios?</h2>
+    <ul class="resumen" data-resumen></ul>
+    <div class="dialogo-acciones">
+      <button class="btn btn-sec" type="button" data-cancelar>Revisar</button>
+      <button class="btn" type="button" data-publicar>Sí, publicar</button>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var API = "/api/panel";
+      var MINIMO = 1000;
+      var $ = function (sel, scope) { return (scope || document).querySelector(sel); };
+      var $$ = function (sel, scope) { return Array.prototype.slice.call((scope || document).querySelectorAll(sel)); };
+
+      var servicios = []; // { id, nombre, detalle, nota, grupo, precio, input, fila, antes }
+      var ronda = 0;      // verificación de publicación en curso
+      var dialogo = $("[data-confirmar]");
+      var login = $("[data-login]");
+
+      function formatear(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+      function numero(texto) { var d = String(texto).replace(/\D/g, ""); return d ? parseInt(d, 10) : 0; }
+      /* La cajita crece con el precio para que el $ quede pegado al número. */
+      function ajustar(input) { input.style.width = Math.max(input.value.length, 5) + 0.6 + "ch"; }
+
+      function mostrar(vista) {
+        $$("[data-vista]").forEach(function (el) { el.hidden = el.getAttribute("data-vista") !== vista; });
+        $("[data-barra]").hidden = vista !== "editor";
+      }
+
+      function estado(texto, tipo) {
+        var el = $("[data-estado]");
+        el.textContent = texto;
+        el.className = "barra-estado" + (tipo ? " " + tipo : "");
+      }
+
+      function aviso(texto) {
+        $("[data-aviso]").textContent = texto;
+        mostrar("aviso");
+      }
+
+      function api(metodo, accion, datos) {
+        return fetch(API + (accion ? "?accion=" + accion : ""), {
+          method: metodo,
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: datos ? { "Content-Type": "application/json" } : {},
+          body: datos ? JSON.stringify(datos) : undefined
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (cuerpo) {
+            return { estado: r.status, cuerpo: cuerpo };
+          });
+        });
+      }
+
+      /* Lee los precios marcados con data-tarifa en el HTML de la página. */
+      function leerServicios(html) {
+        var doc = new DOMParser().parseFromString(html, "text/html");
+        return $$("[data-tarifa]", doc).map(function (el) {
+          var item = el.closest("li, article");
+          var titulo = item && item.querySelector(".menu-name, h3");
+          var nombre = "";
+          if (titulo) {
+            var copia = titulo.cloneNode(true);
+            $$(".tag", copia).forEach(function (t) { t.remove(); });
+            nombre = copia.textContent.replace(/\s+/g, " ").trim();
+          }
+          var meta = item && item.querySelector(".program-meta");
+          var siguiente = el.nextElementSibling;
+          var seccion = el.closest("section");
+          var grupo = seccion && seccion.querySelector(".kicker");
+          return {
+            id: el.getAttribute("data-tarifa"),
+            nombre: nombre || el.getAttribute("data-tarifa"),
+            detalle: meta ? meta.textContent.trim() : "",
+            nota: siguiente && siguiente.tagName === "SMALL" ? siguiente.textContent.trim() : "",
+            grupo: grupo ? grupo.textContent.trim() : "Otros",
+            precio: numero(el.textContent)
+          };
+        });
+      }
+
+      function pintar(lista) {
+        var contenedor = $("[data-grupos]");
+        contenedor.textContent = "";
+        servicios = lista;
+        var bloques = {};
+        lista.forEach(function (s) {
+          if (!bloques[s.grupo]) {
+            var bloque = document.createElement("section");
+            bloque.className = "card grupo";
+            var h = document.createElement("h2");
+            h.textContent = s.grupo;
+            bloque.appendChild(h);
+            contenedor.appendChild(bloque);
+            bloques[s.grupo] = bloque;
+          }
+          var fila = document.createElement("label");
+          fila.className = "fila";
+          fila.innerHTML =
+            '<span class="fila-texto"><span class="fila-nombre"></span><span class="fila-detalle"></span></span>' +
+            '<span class="precio">$<input inputmode="numeric" autocomplete="off" enterkeyhint="done" /></span>' +
+            '<span class="precio-nota"></span>' +
+            '<span class="fila-antes"></span>';
+          $(".fila-nombre", fila).textContent = s.nombre;
+          $(".fila-detalle", fila).textContent = s.detalle;
+          if (s.nota) $(".precio-nota", fila).textContent = s.nota;
+          else $(".precio-nota", fila).remove();
+          s.fila = fila;
+          s.antes = $(".fila-antes", fila);
+          s.input = $("input", fila);
+          s.input.value = formatear(s.precio);
+          ajustar(s.input);
+          s.input.setAttribute("aria-label", "Precio de " + s.nombre);
+          s.input.addEventListener("focus", function () { s.input.select(); });
+          s.input.addEventListener("input", function () {
+            var n = numero(s.input.value);
+            s.input.value = n ? formatear(n) : "";
+            ajustar(s.input);
+            actualizar();
+          });
+          s.input.addEventListener("keydown", function (e) { if (e.key === "Enter") s.input.blur(); });
+          bloques[s.grupo].appendChild(fila);
+        });
+      }
+
+      function pendientes() {
+        return servicios.filter(function (s) { return numero(s.input.value) !== s.precio; });
+      }
+
+      function actualizar() {
+        var malos = 0;
+        servicios.forEach(function (s) {
+          var n = numero(s.input.value);
+          var cambiado = n !== s.precio;
+          var malo = n < MINIMO;
+          if (malo) malos++;
+          s.fila.classList.toggle("cambiado", cambiado && !malo);
+          s.fila.classList.toggle("invalido", malo);
+          s.antes.textContent = malo ? "Escribe un precio válido" : cambiado ? "Antes: $" + formatear(s.precio) : "";
+        });
+        var lista = pendientes();
+        $("[data-guardar]").disabled = !lista.length || malos > 0;
+        $("[data-deshacer]").hidden = !lista.length;
+        if (malos) estado("Revisa los precios marcados en rojo", "error");
+        else if (lista.length) estado(lista.length === 1 ? "1 cambio sin guardar" : lista.length + " cambios sin guardar");
+        else estado("Sin cambios");
+      }
+
+      function cargar() {
+        if (servicios.length) { mostrar("editor"); actualizar(); return; }
+        mostrar("cargando");
+        api("GET").then(function (r) {
+          if (r.estado === 200 && r.cuerpo.html) {
+            pintar(leerServicios(r.cuerpo.html));
+            mostrar("editor");
+            actualizar();
+          } else if (r.estado === 401) {
+            pedirLogin("");
+          } else {
+            aviso(r.cuerpo.error || "No se pudo abrir el panel. Recarga la página.");
+          }
+        }).catch(function () {
+          aviso("No hay conexión con el panel. Revisa el internet y recarga la página.");
+        });
+      }
+
+      function pedirLogin(mensaje) {
+        $("[data-error-login]").textContent = mensaje;
+        mostrar("login");
+        login.usuario.focus();
+      }
+
+      login.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var usuario = login.usuario.value.trim();
+        var clave = login.clave.value;
+        var error = $("[data-error-login]");
+        if (!usuario || !clave) { error.textContent = "Escribe tu usuario y tu contraseña."; return; }
+        var boton = $("[data-entrar]");
+        boton.disabled = true;
+        boton.textContent = "Entrando…";
+        error.textContent = "";
+        api("POST", "entrar", { usuario: usuario, clave: clave }).then(function (r) {
+          if (r.estado === 200) { login.clave.value = ""; cargar(); }
+          else error.textContent = r.cuerpo.error || "No se pudo entrar. Intenta de nuevo.";
+        }).catch(function () {
+          error.textContent = "No hay conexión. Revisa el internet e intenta de nuevo.";
+        }).then(function () {
+          boton.disabled = false;
+          boton.textContent = "Entrar";
+        });
+      });
+
+      $("[data-ver-clave]").addEventListener("click", function () {
+        var visible = login.clave.type === "text";
+        login.clave.type = visible ? "password" : "text";
+        this.textContent = visible ? "Ver" : "Ocultar";
+        this.setAttribute("aria-label", visible ? "Mostrar contraseña" : "Ocultar contraseña");
+      });
+
+      $("[data-deshacer]").addEventListener("click", function () {
+        servicios.forEach(function (s) { s.input.value = formatear(s.precio); ajustar(s.input); });
+        actualizar();
+      });
+
+      $("[data-guardar]").addEventListener("click", function () {
+        var lista = pendientes();
+        if (!lista.length) return;
+        var resumen = $("[data-resumen]");
+        resumen.textContent = "";
+        lista.forEach(function (s) {
+          var li = document.createElement("li");
+          li.innerHTML = "<span></span><span><s></s> → <strong></strong></span>";
+          $("span", li).textContent = s.nombre;
+          $("s", li).textContent = "$" + formatear(s.precio);
+          $("strong", li).textContent = "$" + formatear(numero(s.input.value));
+          resumen.appendChild(li);
+        });
+        dialogo.showModal();
+      });
+
+      $("[data-cancelar]").addEventListener("click", function () { dialogo.close(); });
+
+      $("[data-publicar]").addEventListener("click", function () {
+        var lista = pendientes();
+        var cambios = {};
+        lista.forEach(function (s) { cambios[s.id] = numero(s.input.value); });
+        var boton = this;
+        boton.disabled = true;
+        boton.textContent = "Publicando…";
+        api("POST", "guardar", { cambios: cambios }).then(function (r) {
+          dialogo.close();
+          if (r.estado === 401) {
+            pedirLogin("Tu sesión terminó. Entra de nuevo y vuelve a tocar Guardar: tus cambios siguen ahí.");
+            return;
+          }
+          if (r.estado !== 200) { estado(r.cuerpo.error || "No se pudo guardar. Intenta de nuevo.", "error"); return; }
+          lista.forEach(function (s) { s.precio = cambios[s.id]; });
+          actualizar();
+          estado("Guardado ✓ Publicando en la página…", "ok");
+          verificarPublicacion(cambios);
+        }).catch(function () {
+          dialogo.close();
+          estado("No hay conexión. Revisa el internet e intenta de nuevo.", "error");
+        }).then(function () {
+          boton.disabled = false;
+          boton.textContent = "Sí, publicar";
+        });
+      });
+
+      /* Revisa la página pública hasta que muestre los precios guardados. */
+      function verificarPublicacion(cambios) {
+        var mia = ++ronda;
+        var inicio = Date.now();
+        var avisar = function (texto) { if (mia === ronda && !pendientes().length) estado(texto, "ok"); };
+        var seguir = function () {
+          if (mia !== ronda) return;
+          if (Date.now() - inicio > 4 * 60 * 1000) { avisar("Guardado ✓ Puede tardar unos minutos más en verse en la página."); return; }
+          setTimeout(revisar, 8000);
+        };
+        var revisar = function () {
+          fetch("/?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (html) {
+            var vivos = {};
+            leerServicios(html).forEach(function (s) { vivos[s.id] = s.precio; });
+            var listo = Object.keys(cambios).every(function (id) { return vivos[id] === cambios[id]; });
+            if (listo) avisar("Publicado ✓ Los precios nuevos ya están en la página.");
+            else seguir();
+          }).catch(seguir);
+        };
+        setTimeout(revisar, 5000);
+      }
+
+      $("[data-salir]").addEventListener("click", function () {
+        if (pendientes().length && !confirm("Tienes cambios sin guardar. ¿Salir de todas formas?")) return;
+        api("POST", "salir", {}).catch(function () {}).then(function () {
+          servicios = [];
+          ronda++;
+          $("[data-grupos]").textContent = "";
+          pedirLogin("");
+        });
+      });
+
+      window.addEventListener("beforeunload", function (e) {
+        if (pendientes().length) { e.preventDefault(); e.returnValue = ""; }
+      });
+
+      cargar();
+    })();
+  </script>
+</body>
+</html>

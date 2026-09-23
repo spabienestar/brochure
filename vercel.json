@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/tarifas", "destination": "/panel/index.html" },
+    { "source": "/tarifas/", "destination": "/panel/index.html" }
+  ]
+}
