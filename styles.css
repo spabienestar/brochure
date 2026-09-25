@@ -479,11 +479,18 @@ ul, ol { list-style: none; padding: 0; }
   gap: 0.4rem 4rem;
 }
 .menu-list li {
+  padding-block: 0.95rem;
+  border-bottom: 1px solid rgba(44, 42, 34, 0.1);
+}
+.menu-row {
   display: flex;
   align-items: baseline;
   gap: 0.7rem;
-  padding-block: 0.95rem;
-  border-bottom: 1px solid rgba(44, 42, 34, 0.1);
+}
+.menu-desc {
+  margin-top: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
 }
 .menu-name {
   font-weight: 500;
@@ -661,6 +668,9 @@ ul, ol { list-style: none; padding: 0; }
   .program-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .program-card-wide { grid-column: 1 / -1; }
+
+/* Textos editables desde el panel (/tarifas): si quedan vacíos, no ocupan espacio */
+[data-texto]:empty { display: none; }
 
 /* =============================================================
    12. Post-quirúrgico

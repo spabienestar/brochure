@@ -1,8 +1,13 @@
-// Panel de tarifas de Olivé Spa (función de Vercel).
+// Panel de contenido de Olivé Spa (función de Vercel).
 //
 // Valida el usuario y la contraseña del panel, lee index.html desde GitHub y
-// guarda los precios nuevos como un commit en `main`. Vercel publica ese commit
-// automáticamente, igual que cualquier otro push.
+// guarda precios, textos y fotos nuevos en un solo commit en `main`. Vercel
+// publica ese commit automáticamente, igual que cualquier otro push.
+//
+// Lo editable está marcado en index.html:
+//   data-tarifa="id"                 precio del servicio (solo el texto del precio)
+//   data-texto="id:campo"            nombre, descripcion o detalle (solo texto y <br>)
+//   data-foto="id"                   foto (img, y también link/meta que deban seguirla)
 //
 // Variables de entorno (Vercel → Settings → Environment Variables):
 //   PANEL_USUARIO  usuario del panel
@@ -15,13 +20,26 @@ const crypto = require("crypto");
 const REPO = "spabienestar/brochure";
 const RAMA = "main";
 const ARCHIVO = "index.html";
+const SITIO = "https://olivespamedellin.com/";
+const CARPETA_FOTOS = "assets/img/panel/";
 const COOKIE = "olive_panel";
 const DURACION_SESION = 8 * 60 * 60; // segundos
 const PRECIO_MIN = 1000;
 const PRECIO_MAX = 50000000;
+const FOTO_MAX_BYTES = 3 * 1024 * 1024;
+const FOTOS_POR_GUARDADO = 8;
+const CAMPOS = {
+  nombre: { max: 90, varias_lineas: false, obligatorio: true },
+  detalle: { max: 90, varias_lineas: false, obligatorio: false },
+  descripcion: { max: 700, varias_lineas: true, obligatorio: false }
+};
 
 // Elemento con data-tarifa="id" cuyo contenido es solo el precio, sin etiquetas dentro.
 const PATRON_TARIFA = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-tarifa="([a-z0-9-]+)"[^>]*>)([^<]*)(<\/\2>)/gi;
+// Elemento con data-texto="id:campo" cuyo contenido es texto con, a lo sumo, saltos <br>.
+const PATRON_TEXTO = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-texto="([a-z0-9-]+):(nombre|descripcion|detalle)"[^>]*>)((?:[^<]|<br\s*\/?>)*)(<\/\2>)/gi;
+// Etiqueta img/link/meta con data-foto="id".
+const PATRON_FOTO = /<(img|link|meta)\b[^>]*?\sdata-foto="([a-z0-9-]+)"[^>]*>/gi;
 
 function conEstado(estado, mensaje) {
   const error = new Error(mensaje);
@@ -117,61 +135,175 @@ async function github(cfg, metodo, ruta, cuerpo) {
   });
   const datos = await respuesta.json().catch(() => ({}));
   if (respuesta.ok) return datos;
-  if (respuesta.status === 409) throw conEstado(409, "Alguien guardó cambios al mismo tiempo. Recarga la página e intenta de nuevo.");
+  // Al mover la rama, 422 significa que alguien más guardó antes (no es "fast forward").
+  if (respuesta.status === 409 || (respuesta.status === 422 && metodo === "PATCH")) {
+    throw conEstado(409, "Alguien guardó cambios al mismo tiempo. Recarga la página e intenta de nuevo.");
+  }
   if (respuesta.status === 401) throw conEstado(502, "El token de GitHub no es válido o ya venció.");
   if (respuesta.status === 403 || respuesta.status === 404) throw conEstado(502, "El token de GitHub no tiene permiso para editar el sitio.");
   throw conEstado(502, "GitHub respondió " + respuesta.status + ". Intenta de nuevo en un momento.");
 }
 
-async function leerIndex(cfg) {
-  const datos = await github(cfg, "GET", "/contents/" + ARCHIVO + "?ref=" + RAMA);
-  return { html: Buffer.from(datos.content, "base64").toString("utf8"), sha: datos.sha };
+async function leerIndex(cfg, referencia) {
+  const datos = await github(cfg, "GET", "/contents/" + ARCHIVO + "?ref=" + referencia);
+  return Buffer.from(datos.content, "base64").toString("utf8");
 }
 
 function formatear(precio) {
   return "$" + String(precio).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-function validarCambios(cambios) {
-  if (!cambios || typeof cambios !== "object" || Array.isArray(cambios)) throw conEstado(400, "Datos inválidos.");
-  const limpios = Object.create(null);
-  for (const [id, valor] of Object.entries(cambios)) {
+function aHtml(texto) {
+  return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
+}
+
+function deHtml(html) {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&");
+}
+
+function resumir(texto) {
+  const linea = texto.replace(/\s+/g, " ").trim();
+  return linea ? "«" + (linea.length > 60 ? linea.slice(0, 57) + "…" : linea) + "»" : "(vacío)";
+}
+
+function limpiarTexto(valor, campo) {
+  const reglas = CAMPOS[campo];
+  let texto = String(valor == null ? "" : valor).replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "");
+  if (reglas.varias_lineas) {
+    texto = texto.split("\n").map((linea) => linea.replace(/\s+/g, " ").trim()).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  } else {
+    texto = texto.replace(/\s+/g, " ").trim();
+  }
+  if (reglas.obligatorio && !texto) throw conEstado(400, "El nombre de un servicio no puede quedar vacío.");
+  if (texto.length > reglas.max) throw conEstado(400, "Un texto es demasiado largo (máximo " + reglas.max + " caracteres).");
+  return texto;
+}
+
+function validarPedido(cuerpo) {
+  const precios = Object.create(null);
+  const textos = Object.create(null);
+  const fotos = Object.create(null);
+  const esObjeto = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
+
+  // `cambios` es el nombre que usaba la primera versión del panel para los precios.
+  const entradaPrecios = cuerpo.precios || cuerpo.cambios || {};
+  const entradaTextos = cuerpo.textos || {};
+  const entradaFotos = cuerpo.fotos || {};
+  if (!esObjeto(entradaPrecios) || !esObjeto(entradaTextos) || !esObjeto(entradaFotos)) throw conEstado(400, "Datos inválidos.");
+
+  for (const [id, valor] of Object.entries(entradaPrecios)) {
     const precio = Number(valor);
     if (!/^[a-z0-9-]+$/.test(id) || !Number.isInteger(precio) || precio < PRECIO_MIN || precio > PRECIO_MAX) {
       throw conEstado(400, "Hay un precio no válido. Revisa los valores e intenta de nuevo.");
     }
-    limpios[id] = precio;
+    precios[id] = precio;
   }
-  if (!Object.keys(limpios).length) throw conEstado(400, "No hay cambios para guardar.");
-  return limpios;
+  for (const [clave, valor] of Object.entries(entradaTextos)) {
+    const partes = /^([a-z0-9-]+):(nombre|descripcion|detalle)$/.exec(clave);
+    if (!partes) throw conEstado(400, "Hay un texto no válido.");
+    textos[clave] = limpiarTexto(valor, partes[2]);
+  }
+  const idsFotos = Object.keys(entradaFotos);
+  if (idsFotos.length > FOTOS_POR_GUARDADO) throw conEstado(400, "Son muchas fotos a la vez. Guarda máximo " + FOTOS_POR_GUARDADO + ".");
+  for (const id of idsFotos) {
+    const foto = entradaFotos[id];
+    if (!/^[a-z0-9-]+$/.test(id) || !esObjeto(foto) || typeof foto.datos !== "string") throw conEstado(400, "Hay una foto no válida.");
+    const bytes = Buffer.from(foto.datos, "base64");
+    // Solo JPEG: el panel convierte y comprime todas las fotos antes de enviarlas.
+    if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) throw conEstado(400, "Una de las fotos no es una imagen válida.");
+    if (bytes.length > FOTO_MAX_BYTES) throw conEstado(400, "Una de las fotos es demasiado pesada.");
+    fotos[id] = { datos: bytes.toString("base64"), alt: limpiarTexto(foto.alt, "detalle") };
+  }
+  if (!Object.keys(precios).length && !Object.keys(textos).length && !idsFotos.length) throw conEstado(400, "No hay cambios para guardar.");
+  return { precios, textos, fotos };
 }
 
-async function guardar(cfg, cambios) {
+// Aplica el pedido sobre el HTML. Devuelve el HTML nuevo y una línea por cambio real.
+function aplicar(html, pedido, rutasFotos) {
+  const vistos = new Set();
+  const lineas = [];
+
+  let nuevo = html.replace(PATRON_TARIFA, (todo, abre, _etiqueta, id, texto, cierra) => {
+    if (!(id in pedido.precios)) return todo;
+    vistos.add("precio:" + id);
+    const precio = formatear(pedido.precios[id]);
+    if (texto.trim() === precio) return todo;
+    lineas.push("- precio " + id + ": " + texto.trim() + " → " + precio);
+    return abre + precio + cierra;
+  });
+
+  nuevo = nuevo.replace(PATRON_TEXTO, (todo, abre, _etiqueta, id, campo, contenido, cierra) => {
+    const clave = id + ":" + campo;
+    if (!(clave in pedido.textos)) return todo;
+    vistos.add("texto:" + clave);
+    const texto = pedido.textos[clave];
+    const anterior = deHtml(contenido).trim();
+    if (anterior === texto) return todo;
+    lineas.push("- " + campo + " " + id + ": " + resumir(anterior) + " → " + resumir(texto));
+    return abre + aHtml(texto) + cierra;
+  });
+
+  nuevo = nuevo.replace(PATRON_FOTO, (etiqueta, tipo, id) => {
+    if (!(id in rutasFotos)) return etiqueta;
+    const ruta = rutasFotos[id];
+    tipo = tipo.toLowerCase();
+    if (tipo === "link") return etiqueta.replace(/\shref="[^"]*"/i, ' href="' + ruta + '"');
+    if (tipo === "meta") return etiqueta.replace(/\scontent="[^"]*"/i, ' content="' + SITIO + ruta + '"');
+    vistos.add("foto:" + id);
+    // El recorte (object-position) era para la foto anterior; el texto alternativo describe la nueva.
+    let nueva = etiqueta.replace(/\ssrc="[^"]*"/i, ' src="' + ruta + '"').replace(/\sstyle="[^"]*"/i, "");
+    const alt = pedido.fotos[id].alt;
+    if (alt && /\salt="[^"]+"/i.test(nueva)) nueva = nueva.replace(/\salt="[^"]*"/i, ' alt="' + aHtml(alt) + '"');
+    return nueva;
+  });
+  for (const id of Object.keys(rutasFotos)) lineas.push("- foto " + id + ": " + rutasFotos[id]);
+
+  const faltan = [
+    ...Object.keys(pedido.precios).filter((id) => !vistos.has("precio:" + id)),
+    ...Object.keys(pedido.textos).filter((clave) => !vistos.has("texto:" + clave)),
+    ...Object.keys(rutasFotos).filter((id) => !vistos.has("foto:" + id))
+  ];
+  if (faltan.length) throw conEstado(400, "No se encontraron estos elementos en la página: " + faltan.join(", "));
+  return { html: nuevo, lineas };
+}
+
+// Guarda todo en un solo commit con la API de datos de Git (blobs → árbol → commit → rama).
+async function publicar(cfg, pedido) {
+  const sello = new Date().toISOString().replace(/\D/g, "").slice(0, 14) + "-" + crypto.randomBytes(2).toString("hex");
+  const archivosFotos = [];
+  const rutasFotos = Object.create(null);
+  for (const [id, foto] of Object.entries(pedido.fotos)) {
+    const ruta = CARPETA_FOTOS + id + "-" + sello + ".jpg";
+    const blob = await github(cfg, "POST", "/git/blobs", { content: foto.datos, encoding: "base64" });
+    archivosFotos.push({ path: ruta, mode: "100644", type: "blob", sha: blob.sha });
+    rutasFotos[id] = ruta;
+  }
+
   for (let intento = 1; ; intento++) {
-    const { html, sha } = await leerIndex(cfg);
-    const vistos = new Set();
-    const aplicados = [];
-    const nuevo = html.replace(PATRON_TARIFA, (todo, abre, _etiqueta, id, texto, cierra) => {
-      if (!(id in cambios)) return todo;
-      vistos.add(id);
-      const precio = formatear(cambios[id]);
-      if (texto.trim() !== precio) aplicados.push("- " + id + ": " + texto.trim() + " → " + precio);
-      return abre + precio + cierra;
+    const rama = await github(cfg, "GET", "/git/ref/heads/" + RAMA);
+    const cabeza = rama.object.sha;
+    const commitActual = await github(cfg, "GET", "/git/commits/" + cabeza);
+    const { html, lineas } = aplicar(await leerIndex(cfg, cabeza), pedido, rutasFotos);
+    if (!lineas.length) return { cambios: 0, fotos: {} };
+
+    const arbol = await github(cfg, "POST", "/git/trees", {
+      base_tree: commitActual.tree.sha,
+      tree: [{ path: ARCHIVO, mode: "100644", type: "blob", content: html }, ...archivosFotos]
     });
-    const faltan = Object.keys(cambios).filter((id) => !vistos.has(id));
-    if (faltan.length) throw conEstado(400, "No se encontraron estos servicios en la página: " + faltan.join(", "));
-    if (!aplicados.length) return { cambios: 0 };
+    const commit = await github(cfg, "POST", "/git/commits", {
+      message: "Contenido actualizado desde el panel (" + lineas.length + ")\n\n" + lineas.join("\n"),
+      tree: arbol.sha,
+      parents: [cabeza]
+    });
     try {
-      await github(cfg, "PUT", "/contents/" + ARCHIVO, {
-        message: "Tarifas actualizadas desde el panel (" + aplicados.length + ")\n\n" + aplicados.join("\n"),
-        content: Buffer.from(nuevo, "utf8").toString("base64"),
-        sha,
-        branch: RAMA
-      });
-      return { cambios: aplicados.length };
+      await github(cfg, "PATCH", "/git/refs/heads/" + RAMA, { sha: commit.sha, force: false });
+      return { cambios: lineas.length, fotos: rutasFotos };
     } catch (error) {
-      // Otro cambio entró justo antes: se reintenta una vez sobre la versión nueva.
-      if (error.estado === 409 && intento < 2) continue;
+      // Otro cambio entró justo antes: se rehace sobre la versión nueva (las fotos ya subidas se reutilizan).
+      if (error.estado === 409 && intento < 3) continue;
       throw error;
     }
   }
@@ -220,13 +352,11 @@ module.exports = async function panel(req, res) {
     if (!sesionValida(cfg, leerCookie(req))) return responder(401, { error: "Tu sesión terminó. Vuelve a entrar." });
 
     if (req.method === "GET") {
-      const { html } = await leerIndex(cfg);
-      return responder(200, { html });
+      return responder(200, { html: await leerIndex(cfg, RAMA) });
     }
 
     if (req.method === "POST" && accion === "guardar") {
-      const { cambios } = await leerCuerpo(req);
-      const resultado = await guardar(cfg, validarCambios(cambios));
+      const resultado = await publicar(cfg, validarPedido(await leerCuerpo(req)));
       return responder(200, { ok: true, ...resultado });
     }
 

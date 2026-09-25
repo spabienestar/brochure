@@ -18,18 +18,30 @@ styles.css        ← estilos
 main.js           ← interacciones (nav, reveals, contadores)
 lib/              ← GSAP + ScrollTrigger + datos de marca
 assets/img/       ← fotografías (repositorios gratuitos, ver créditos)
-panel/            ← panel privado para cambiar precios (se abre en /tarifas)
-api/panel.js      ← función de Vercel que valida el acceso y guarda los precios
+assets/img/panel/ ← fotos subidas desde el panel
+panel/            ← panel privado de administración (se abre en /tarifas)
+api/panel.js      ← función de Vercel que valida el acceso y guarda los cambios
 vercel.json       ← muestra panel/ en la dirección /tarifas
 ```
 
 Las fotografías provienen de repositorios gratuitos bajo licencias Creative Commons / dominio público (vía Openverse); la atribución completa está en `creditos.html`.
 
-## Panel de tarifas
+## Panel de administración
 
-`/tarifas` es un panel privado (no enlazado desde el sitio y marcado `noindex`) para que la dueña cambie los precios desde el celular. Al tocar **Guardar y publicar**, `api/panel.js` escribe los precios nuevos en `index.html` como un commit en `main`, y Vercel lo publica solo en 1–2 minutos.
+`/tarifas` es un panel privado (no enlazado desde el sitio y marcado `noindex`) para que la dueña cambie desde el celular los precios, nombres, descripciones y fotos. Al tocar **Guardar y publicar**, `api/panel.js` guarda todo en un solo commit en `main` (el `index.html` actualizado y las fotos nuevas en `assets/img/panel/`), y Vercel lo publica solo en 1–2 minutos.
 
-- Cada precio editable lleva `data-tarifa="id"` y dentro solo el texto del precio (`$350.000`). Un servicio nuevo necesita su propio `data-tarifa` para aparecer en el panel.
+Lo editable está marcado en `index.html`; lo que no lleve estas marcas no aparece en el panel:
+
+| Marca | Qué edita | Contenido permitido |
+|---|---|---|
+| `data-tarifa="id"` | precio | solo el texto del precio (`$350.000`) |
+| `data-texto="id:nombre"` | nombre del servicio | solo texto |
+| `data-texto="id:descripcion"` | descripción (si queda vacía, no se muestra) | texto y `<br>` |
+| `data-texto="id:detalle"` | duración o detalle | solo texto |
+| `data-foto="id"` | foto (`img`; también el `link` de precarga y el `og:image` de la portada) | — |
+
+- Un servicio nuevo necesita su `data-tarifa` y sus `data-texto` con el mismo `id`; una foto de sección lleva además `data-foto-etiqueta` con el nombre que se ve en el panel.
+- El panel convierte las fotos a JPEG liviano (máx. 1800 px) antes de subirlas.
 - El panel también hace commits en `main`: haz `git pull` antes de editar en local.
 
 Variables de entorno en Vercel (Settings → Environment Variables, entorno Production):

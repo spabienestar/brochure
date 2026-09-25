@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Panel de tarifas · Olivé Spa</title>
+  <title>Panel · Olivé Spa</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/favicon-32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -62,27 +62,21 @@
     .login { max-width: 400px; margin-inline: auto; display: grid; gap: 1rem; }
     .login h1 { font-family: var(--serif); font-weight: 600; font-size: 1.7rem; }
     .campo { display: grid; gap: 0.35rem; font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); }
-    .campo input, .clave {
+    .campo input, .campo textarea, .clave {
       width: 100%;
       font: 400 1rem var(--sans);
       color: var(--ink);
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 0.8rem 0.9rem;
+      padding: 0.75rem 0.9rem;
     }
+    .campo textarea { resize: none; overflow: hidden; min-height: 5.5rem; line-height: 1.45; }
+    .campo input:focus, .campo textarea:focus, .clave:focus-within { border-color: var(--accent); outline: none; }
     .clave { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.4rem 0 0; }
     .clave input { flex: 1; border: 0; background: transparent; padding: 0.8rem 0.9rem; font: inherit; min-width: 0; }
     .clave input:focus-visible { outline: none; }
-    .clave:focus-within, .campo > input:focus { border-color: var(--accent); outline: none; }
-    .ver-clave {
-      border: 0;
-      background: none;
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 0.5rem;
-    }
+    .ver-clave { border: 0; background: none; color: var(--accent); font-size: 0.8rem; font-weight: 600; padding: 0.5rem; }
     .error { color: var(--error); font-size: 0.85rem; min-height: 1.3em; }
 
     .btn {
@@ -115,17 +109,9 @@
       text-transform: uppercase;
       color: var(--accent);
     }
-    .fila {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.2rem 0.9rem;
-      align-items: center;
-      padding: 0.85rem 1rem;
-      border-top: 1px solid var(--line);
-      cursor: text;
-      transition: background 0.2s;
-    }
+    .fila { padding: 0.85rem 1rem; border-top: 1px solid var(--line); transition: background 0.2s; }
     .grupo h2 + .fila { border-top: 0; }
+    .fila-principal { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 0.9rem; align-items: center; }
     .fila-texto { display: grid; gap: 0.1rem; min-width: 0; }
     .fila-nombre { font-weight: 500; font-size: 0.92rem; }
     .fila-detalle { font-size: 0.74rem; color: var(--ink-mute); }
@@ -140,25 +126,47 @@
       font-family: var(--serif);
       font-weight: 600;
       font-size: 1.2rem;
+      cursor: text;
     }
     .precio:focus-within { border-color: var(--accent); }
-    .precio input {
-      width: 7.6ch;
-      border: 0;
-      background: transparent;
-      font: inherit;
-      color: var(--ink);
-      text-align: right;
-      padding: 0;
-    }
+    .precio input { width: 7.6ch; border: 0; background: transparent; font: inherit; color: var(--ink); text-align: right; padding: 0; }
     .precio input:focus-visible { outline: none; }
     .precio-nota { grid-column: 2; justify-self: end; font-size: 0.7rem; color: var(--ink-mute); }
-    .fila-antes { grid-column: 1 / -1; font-size: 0.74rem; color: var(--accent-2); font-weight: 500; }
-    .fila-antes:empty { display: none; }
+    .fila-aviso { grid-column: 1 / -1; font-size: 0.74rem; color: var(--accent-2); font-weight: 500; }
+    .fila-aviso:empty { display: none; }
     .fila.cambiado { background: rgba(185, 146, 79, 0.1); }
-    .fila.cambiado .precio { border-color: var(--accent-2); }
-    .fila.invalido .precio { border-color: var(--error); }
-    .fila.invalido .fila-antes { color: var(--error); }
+    .fila.cambiado .precio.modificado { border-color: var(--accent-2); }
+    .fila.invalido .fila-aviso { color: var(--error); }
+
+    .editar {
+      margin-top: 0.55rem;
+      border: 0;
+      background: none;
+      padding: 0.2rem 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .editar::before { content: "✎ "; }
+    .editar[aria-expanded="true"]::before { content: "▴ "; }
+    .edicion { display: grid; gap: 0.9rem; margin-top: 0.7rem; padding-top: 0.9rem; border-top: 1px dashed var(--line); }
+    .campo.modificado { color: var(--accent-2); }
+    .campo.modificado input, .campo.modificado textarea { border-color: var(--accent-2); }
+    .campo.invalido input { border-color: var(--error); }
+    .foto-campo { display: flex; gap: 0.9rem; align-items: center; }
+    .miniatura {
+      width: 110px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      background: var(--sage);
+      border: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .foto-acciones { display: grid; gap: 0.35rem; justify-items: start; }
+    .btn-foto { display: inline-block; padding: 0.55rem 1rem; font-size: 0.82rem; cursor: pointer; }
+    .foto-estado { font-size: 0.74rem; color: var(--ink-mute); font-weight: 400; }
+    .foto-fila .foto-campo { margin-top: 0.6rem; }
 
     /* ---------- Barra inferior ---------- */
     .barra {
@@ -193,10 +201,14 @@
     }
     .dialogo::backdrop { background: rgba(44, 42, 34, 0.5); }
     .dialogo h2 { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; margin-bottom: 0.9rem; }
-    .resumen { list-style: none; padding: 0; display: grid; gap: 0.6rem; max-height: 50vh; overflow: auto; }
-    .resumen li { display: grid; gap: 0.1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); font-size: 0.88rem; }
+    .resumen { list-style: none; padding: 0; display: grid; gap: 0.6rem; max-height: 55vh; overflow: auto; }
+    .resumen li { display: grid; gap: 0.15rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); font-size: 0.86rem; }
+    .resumen .r-titulo { font-weight: 600; }
+    .resumen .r-detalle { color: var(--ink-soft); overflow-wrap: anywhere; }
     .resumen s { color: var(--ink-mute); }
     .resumen strong { color: var(--accent); }
+    .resumen .r-aviso { color: var(--error); font-weight: 600; font-size: 0.8rem; }
+    .resumen img { width: 88px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; margin-top: 0.3rem; }
     .dialogo-acciones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.1rem; }
 
     @media (min-width: 560px) {
@@ -210,7 +222,7 @@
   <main class="shell">
     <header class="brand">
       <p class="brand-name">Olivé Spa</p>
-      <p class="brand-tag">Panel de tarifas</p>
+      <p class="brand-tag">Panel de administración</p>
     </header>
 
     <p class="cargando" data-vista="cargando">Cargando…</p>
@@ -236,7 +248,7 @@
 
     <section data-vista="editor" hidden>
       <div class="intro">
-        <p>Cambia los precios y toca <strong>Guardar y publicar</strong>. La página se actualiza sola en 1 o 2 minutos.</p>
+        <p>Cambia precios, nombres, descripciones y fotos, y toca <strong>Guardar y publicar</strong>. La página se actualiza sola en 1 o 2 minutos.</p>
         <div class="intro-acciones">
           <a href="/" target="_blank" rel="noopener">Ver la página</a>
           <button class="link" type="button" data-salir>Salir</button>
@@ -255,7 +267,7 @@
   </footer>
 
   <dialog class="dialogo" data-confirmar>
-    <h2>¿Publicar estos precios?</h2>
+    <h2>¿Publicar estos cambios?</h2>
     <ul class="resumen" data-resumen></ul>
     <div class="dialogo-acciones">
       <button class="btn btn-sec" type="button" data-cancelar>Revisar</button>
@@ -269,30 +281,65 @@
 
       var API = "/api/panel";
       var MINIMO = 1000;
+      var FOTO_LADO_MAX = 1800;     // px del lado más largo tras comprimir
+      var ENVIO_MAX = 3800000;      // bytes del pedido (Vercel acepta hasta 4,5 MB)
+      var ALT_GENERAL = "Olivé Spa, spa a domicilio en Medellín";
+      var ETIQUETAS = { nombre: "Nombre", detalle: "Duración / detalle", descripcion: "Descripción" };
+      var ORDEN_CAMPOS = ["nombre", "detalle", "descripcion"];
+
       var $ = function (sel, scope) { return (scope || document).querySelector(sel); };
       var $$ = function (sel, scope) { return Array.prototype.slice.call((scope || document).querySelectorAll(sel)); };
 
-      var servicios = []; // { id, nombre, detalle, nota, grupo, precio, input, fila, antes }
-      var ronda = 0;      // verificación de publicación en curso
+      var servicios = [];   // ver leerModelo()
+      var fotosPagina = []; // fotos que no son de un servicio (portada, secciones)
+      var ronda = 0;        // verificación de publicación en curso
       var dialogo = $("[data-confirmar]");
       var login = $("[data-login]");
 
+      function crear(etiqueta, clase, html) {
+        var el = document.createElement(etiqueta);
+        if (clase) el.className = clase;
+        if (html) el.innerHTML = html;
+        return el;
+      }
       function formatear(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
       function numero(texto) { var d = String(texto).replace(/\D/g, ""); return d ? parseInt(d, 10) : 0; }
       /* La cajita crece con el precio para que el $ quede pegado al número. */
       function ajustar(input) { input.style.width = Math.max(input.value.length, 5) + 0.6 + "ch"; }
+      /* La casilla de descripción crece con el texto para que se lea completo. */
+      function crecer(area) {
+        if (area.tagName !== "TEXTAREA" || !area.offsetParent) return;
+        area.style.height = "auto";
+        area.style.height = area.scrollHeight + 2 + "px";
+      }
+      /* Misma limpieza que hace el servidor, para saber si un texto cambió de verdad. */
+      function normalizar(valor, campo) {
+        var t = String(valor || "").replace(/\r\n?/g, "\n");
+        if (campo === "descripcion") {
+          return t.split("\n").map(function (l) { return l.replace(/\s+/g, " ").trim(); }).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+        }
+        return t.replace(/\s+/g, " ").trim();
+      }
+      function textoDe(el) {
+        var copia = el.cloneNode(true);
+        $$("br", copia).forEach(function (br) { br.replaceWith("\n"); });
+        return copia.textContent;
+      }
+      function urlSitio(ruta) { return new URL(ruta, location.origin + "/").href; }
+      function resumir(texto, max) {
+        var linea = texto.replace(/\s+/g, " ").trim();
+        return linea.length > max ? linea.slice(0, max - 1) + "…" : linea;
+      }
 
       function mostrar(vista) {
         $$("[data-vista]").forEach(function (el) { el.hidden = el.getAttribute("data-vista") !== vista; });
         $("[data-barra]").hidden = vista !== "editor";
       }
-
       function estado(texto, tipo) {
         var el = $("[data-estado]");
         el.textContent = texto;
         el.className = "barra-estado" + (tipo ? " " + tipo : "");
       }
-
       function aviso(texto) {
         $("[data-aviso]").textContent = texto;
         mostrar("aviso");
@@ -312,96 +359,278 @@
         });
       }
 
-      /* Lee los precios marcados con data-tarifa en el HTML de la página. */
-      function leerServicios(html) {
+      /* Lee de la página lo que se puede editar: data-tarifa, data-texto y data-foto. */
+      function leerModelo(html) {
         var doc = new DOMParser().parseFromString(html, "text/html");
-        return $$("[data-tarifa]", doc).map(function (el) {
-          var item = el.closest("li, article");
-          var titulo = item && item.querySelector(".menu-name, h3");
-          var nombre = "";
-          if (titulo) {
-            var copia = titulo.cloneNode(true);
-            $$(".tag", copia).forEach(function (t) { t.remove(); });
-            nombre = copia.textContent.replace(/\s+/g, " ").trim();
+        var porId = {};
+        var orden = [];
+        function servicio(id, el) {
+          if (!porId[id]) {
+            var seccion = el.closest("section");
+            var kicker = seccion && seccion.querySelector(".kicker");
+            porId[id] = { id: id, grupo: kicker ? kicker.textContent.trim() : "Otros", precio: null, campos: {}, foto: null };
+            orden.push(id);
           }
-          var meta = item && item.querySelector(".program-meta");
+          return porId[id];
+        }
+        $$("[data-tarifa]", doc).forEach(function (el) {
+          var s = servicio(el.getAttribute("data-tarifa"), el);
           var siguiente = el.nextElementSibling;
-          var seccion = el.closest("section");
-          var grupo = seccion && seccion.querySelector(".kicker");
-          return {
-            id: el.getAttribute("data-tarifa"),
-            nombre: nombre || el.getAttribute("data-tarifa"),
-            detalle: meta ? meta.textContent.trim() : "",
-            nota: siguiente && siguiente.tagName === "SMALL" ? siguiente.textContent.trim() : "",
-            grupo: grupo ? grupo.textContent.trim() : "Otros",
-            precio: numero(el.textContent)
+          s.precio = { base: numero(el.textContent), nota: siguiente && siguiente.tagName === "SMALL" ? siguiente.textContent.trim() : "" };
+        });
+        $$("[data-texto]", doc).forEach(function (el) {
+          var partes = el.getAttribute("data-texto").split(":");
+          servicio(partes[0], el).campos[partes[1]] = { base: normalizar(textoDe(el), partes[1]) };
+        });
+        var fotos = [];
+        $$("img[data-foto]", doc).forEach(function (el) {
+          var id = el.getAttribute("data-foto");
+          var foto = { id: id, src: el.getAttribute("src"), etiqueta: el.getAttribute("data-foto-etiqueta") || "", pendiente: null };
+          if (porId[id]) porId[id].foto = foto;
+          else fotos.push(foto);
+        });
+        return { servicios: orden.map(function (id) { return porId[id]; }), fotos: fotos };
+      }
+
+      function nombreActual(s) {
+        return s.campos.nombre ? normalizar(s.campos.nombre.input.value, "nombre") || s.campos.nombre.base : s.id;
+      }
+
+      /* Convierte la foto elegida a JPEG liviano (máx. 1800 px) antes de enviarla. */
+      function prepararFoto(archivo) {
+        return new Promise(function (resolver, rechazar) {
+          if (archivo.type && !/^image\//.test(archivo.type)) { rechazar(new Error("Ese archivo no es una foto.")); return; }
+          var url = URL.createObjectURL(archivo);
+          var img = new Image();
+          img.onload = function () {
+            var escala = Math.min(1, FOTO_LADO_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+            var lienzo = document.createElement("canvas");
+            lienzo.width = Math.round(img.naturalWidth * escala);
+            lienzo.height = Math.round(img.naturalHeight * escala);
+            lienzo.getContext("2d").drawImage(img, 0, 0, lienzo.width, lienzo.height);
+            URL.revokeObjectURL(url);
+            var datosUrl = lienzo.toDataURL("image/jpeg", 0.82);
+            if (datosUrl.length > 3500000) datosUrl = lienzo.toDataURL("image/jpeg", 0.7);
+            resolver({ url: datosUrl, datos: datosUrl.split(",")[1] });
           };
+          img.onerror = function () { URL.revokeObjectURL(url); rechazar(new Error("No se pudo leer esa foto. Prueba con otra (JPG o PNG).")); };
+          img.src = url;
         });
       }
 
-      function pintar(lista) {
+      /* Casilla de foto: miniatura + botón para elegir otra. `foto` es el objeto del modelo. */
+      function campoFoto(foto) {
+        var caja = crear("div", "foto-campo",
+          '<img class="miniatura" alt="" />' +
+          '<div class="foto-acciones">' +
+            '<label class="btn btn-sec btn-foto">Cambiar foto<input type="file" accept="image/*" hidden /></label>' +
+            '<button class="link" type="button" hidden>Quitar foto nueva</button>' +
+            '<p class="foto-estado">Se ajusta sola al tamaño de la página.</p>' +
+          "</div>");
+        var mini = $(".miniatura", caja);
+        var entrada = $("input", caja);
+        var quitar = $("button", caja);
+        var texto = $(".foto-estado", caja);
+        mini.src = urlSitio(foto.src);
+        foto.mini = mini;
+        foto.reiniciar = function () {
+          foto.pendiente = null;
+          mini.src = foto.previa || urlSitio(foto.src);
+          quitar.hidden = true;
+          entrada.value = "";
+          texto.textContent = "Se ajusta sola al tamaño de la página.";
+        };
+        entrada.addEventListener("change", function () {
+          var archivo = entrada.files && entrada.files[0];
+          if (!archivo) return;
+          texto.textContent = "Preparando la foto…";
+          prepararFoto(archivo).then(function (lista) {
+            foto.pendiente = lista;
+            mini.src = lista.url;
+            quitar.hidden = false;
+            texto.textContent = "Foto nueva lista para publicar.";
+            actualizar();
+          }).catch(function (error) {
+            texto.textContent = error.message;
+            entrada.value = "";
+          });
+        });
+        quitar.addEventListener("click", function () { foto.reiniciar(); actualizar(); });
+        return caja;
+      }
+
+      function pintar(modelo) {
         var contenedor = $("[data-grupos]");
         contenedor.textContent = "";
-        servicios = lista;
+        servicios = modelo.servicios;
+        fotosPagina = modelo.fotos;
         var bloques = {};
-        lista.forEach(function (s) {
-          if (!bloques[s.grupo]) {
-            var bloque = document.createElement("section");
-            bloque.className = "card grupo";
-            var h = document.createElement("h2");
-            h.textContent = s.grupo;
-            bloque.appendChild(h);
-            contenedor.appendChild(bloque);
-            bloques[s.grupo] = bloque;
+        function bloque(titulo) {
+          if (!bloques[titulo]) {
+            var b = crear("section", "card grupo");
+            var h = crear("h2");
+            h.textContent = titulo;
+            b.appendChild(h);
+            contenedor.appendChild(b);
+            bloques[titulo] = b;
           }
-          var fila = document.createElement("label");
-          fila.className = "fila";
-          fila.innerHTML =
-            '<span class="fila-texto"><span class="fila-nombre"></span><span class="fila-detalle"></span></span>' +
-            '<span class="precio">$<input inputmode="numeric" autocomplete="off" enterkeyhint="done" /></span>' +
-            '<span class="precio-nota"></span>' +
-            '<span class="fila-antes"></span>';
-          $(".fila-nombre", fila).textContent = s.nombre;
-          $(".fila-detalle", fila).textContent = s.detalle;
-          if (s.nota) $(".precio-nota", fila).textContent = s.nota;
-          else $(".precio-nota", fila).remove();
+          return bloques[titulo];
+        }
+
+        servicios.forEach(function (s) {
+          var fila = crear("div", "fila",
+            '<div class="fila-principal">' +
+              '<div class="fila-texto"><span class="fila-nombre"></span><span class="fila-detalle"></span></div>' +
+            "</div>" +
+            '<button class="editar" type="button" aria-expanded="false"></button>' +
+            '<div class="edicion" hidden></div>');
+          var principal = $(".fila-principal", fila);
+          var edicion = $(".edicion", fila);
+          var boton = $(".editar", fila);
           s.fila = fila;
-          s.antes = $(".fila-antes", fila);
-          s.input = $("input", fila);
-          s.input.value = formatear(s.precio);
-          ajustar(s.input);
-          s.input.setAttribute("aria-label", "Precio de " + s.nombre);
-          s.input.addEventListener("focus", function () { s.input.select(); });
-          s.input.addEventListener("input", function () {
-            var n = numero(s.input.value);
-            s.input.value = n ? formatear(n) : "";
-            ajustar(s.input);
-            actualizar();
+          s.titulo = $(".fila-nombre", fila);
+          s.subtitulo = $(".fila-detalle", fila);
+
+          if (s.precio) {
+            var etiqueta = crear("label", "precio", "$<input inputmode=\"numeric\" autocomplete=\"off\" enterkeyhint=\"done\" />");
+            var entrada = $("input", etiqueta);
+            entrada.value = formatear(s.precio.base);
+            ajustar(entrada);
+            entrada.addEventListener("focus", function () { entrada.select(); });
+            entrada.addEventListener("input", function () {
+              var n = numero(entrada.value);
+              entrada.value = n ? formatear(n) : "";
+              ajustar(entrada);
+              actualizar();
+            });
+            entrada.addEventListener("keydown", function (e) { if (e.key === "Enter") entrada.blur(); });
+            principal.appendChild(etiqueta);
+            if (s.precio.nota) { var nota = crear("span", "precio-nota"); nota.textContent = s.precio.nota; principal.appendChild(nota); }
+            s.precio.input = entrada;
+            s.precio.caja = etiqueta;
+          }
+          s.aviso = crear("span", "fila-aviso");
+          principal.appendChild(s.aviso);
+
+          ORDEN_CAMPOS.forEach(function (campo) {
+            var info = s.campos[campo];
+            if (!info) return;
+            var multilinea = campo === "descripcion";
+            var caja = crear("label", "campo");
+            caja.appendChild(document.createTextNode(ETIQUETAS[campo]));
+            var control = document.createElement(multilinea ? "textarea" : "input");
+            control.maxLength = multilinea ? 700 : 90;
+            if (multilinea) { control.rows = 3; control.placeholder = "Escribe aquí la descripción (opcional)"; }
+            control.value = info.base;
+            control.addEventListener("input", function () { crecer(control); actualizar(); });
+            caja.appendChild(control);
+            edicion.appendChild(caja);
+            info.input = control;
+            info.caja = caja;
           });
-          s.input.addEventListener("keydown", function (e) { if (e.key === "Enter") s.input.blur(); });
-          bloques[s.grupo].appendChild(fila);
+          if (s.foto) {
+            var cajaFoto = crear("div", "campo");
+            cajaFoto.appendChild(document.createTextNode("Foto"));
+            cajaFoto.appendChild(campoFoto(s.foto));
+            edicion.appendChild(cajaFoto);
+          }
+
+          var texto = "Editar nombre" + (s.campos.descripcion ? (s.foto ? ", descripción y foto" : " y descripción") : (s.foto ? " y foto" : ""));
+          boton.textContent = texto;
+          boton.addEventListener("click", function () {
+            var abrir = edicion.hidden;
+            edicion.hidden = !abrir;
+            boton.setAttribute("aria-expanded", abrir ? "true" : "false");
+            boton.textContent = abrir ? "Cerrar" : texto;
+            if (abrir && s.campos.descripcion) {
+              crecer(s.campos.descripcion.input);
+              if (!s.campos.descripcion.input.value) s.campos.descripcion.input.focus();
+            }
+          });
+          bloque(s.grupo).appendChild(fila);
         });
+
+        if (fotosPagina.length) {
+          var grupoFotos = bloque("Fotos de la página");
+          fotosPagina.forEach(function (f) {
+            var fila = crear("div", "fila foto-fila", '<span class="fila-nombre"></span>');
+            $(".fila-nombre", fila).textContent = f.etiqueta || f.id;
+            fila.appendChild(campoFoto(f));
+            f.fila = fila;
+            grupoFotos.appendChild(fila);
+          });
+        }
       }
 
+      /* Lista de cambios sin guardar, con lo que había antes y lo nuevo. */
       function pendientes() {
-        return servicios.filter(function (s) { return numero(s.input.value) !== s.precio; });
+        var lista = [];
+        servicios.forEach(function (s) {
+          if (s.precio) {
+            var n = numero(s.precio.input.value);
+            if (n !== s.precio.base) lista.push({ tipo: "precio", s: s, antes: s.precio.base, despues: n });
+          }
+          ORDEN_CAMPOS.forEach(function (campo) {
+            var info = s.campos[campo];
+            if (!info) return;
+            var valor = normalizar(info.input.value, campo);
+            if (valor !== info.base) lista.push({ tipo: "texto", s: s, campo: campo, antes: info.base, despues: valor });
+          });
+          if (s.foto && s.foto.pendiente) lista.push({ tipo: "foto", s: s, foto: s.foto });
+        });
+        fotosPagina.forEach(function (f) { if (f.pendiente) lista.push({ tipo: "foto", foto: f }); });
+        return lista;
+      }
+
+      function avisoPrecio(n, antes) {
+        if (n % 1000 !== 0) return "¿Seguro? No termina en 000";
+        if (antes && (n > antes * 1.5 || n < antes * 0.5)) return "Cambio grande: revisa que esté bien";
+        return "";
       }
 
       function actualizar() {
         var malos = 0;
         servicios.forEach(function (s) {
-          var n = numero(s.input.value);
-          var cambiado = n !== s.precio;
-          var malo = n < MINIMO;
-          if (malo) malos++;
-          s.fila.classList.toggle("cambiado", cambiado && !malo);
-          s.fila.classList.toggle("invalido", malo);
-          s.antes.textContent = malo ? "Escribe un precio válido" : cambiado ? "Antes: $" + formatear(s.precio) : "";
+          var cambiado = false;
+          var invalido = false;
+          var mensajes = [];
+          if (s.precio) {
+            var n = numero(s.precio.input.value);
+            var precioCambio = n !== s.precio.base;
+            s.precio.caja.classList.toggle("modificado", precioCambio);
+            if (n < MINIMO) { invalido = true; mensajes.push("Escribe un precio válido"); }
+            else if (precioCambio) {
+              cambiado = true;
+              mensajes.push("Antes: $" + formatear(s.precio.base));
+              var extra = avisoPrecio(n, s.precio.base);
+              if (extra) mensajes.push(extra);
+            } else if (n % 1000 !== 0) mensajes.push("Revisa este precio: no termina en 000");
+          }
+          ORDEN_CAMPOS.forEach(function (campo) {
+            var info = s.campos[campo];
+            if (!info) return;
+            var valor = normalizar(info.input.value, campo);
+            var distinto = valor !== info.base;
+            var vacio = campo === "nombre" && !valor;
+            info.caja.classList.toggle("modificado", distinto && !vacio);
+            info.caja.classList.toggle("invalido", vacio);
+            if (vacio) { invalido = true; mensajes.push("El nombre no puede quedar vacío"); }
+            else if (distinto) cambiado = true;
+          });
+          if (s.foto && s.foto.pendiente) { cambiado = true; mensajes.push("Foto nueva"); }
+          if (invalido) malos++;
+          s.titulo.textContent = nombreActual(s);
+          s.subtitulo.textContent = s.campos.detalle ? normalizar(s.campos.detalle.input.value, "detalle") : "";
+          s.fila.classList.toggle("cambiado", cambiado && !invalido);
+          s.fila.classList.toggle("invalido", invalido);
+          s.aviso.textContent = mensajes.join(" · ");
         });
+        fotosPagina.forEach(function (f) { f.fila.classList.toggle("cambiado", !!f.pendiente); });
+
         var lista = pendientes();
         $("[data-guardar]").disabled = !lista.length || malos > 0;
         $("[data-deshacer]").hidden = !lista.length;
-        if (malos) estado("Revisa los precios marcados en rojo", "error");
+        if (malos) estado("Revisa lo marcado en rojo", "error");
         else if (lista.length) estado(lista.length === 1 ? "1 cambio sin guardar" : lista.length + " cambios sin guardar");
         else estado("Sin cambios");
       }
@@ -411,7 +640,7 @@
         mostrar("cargando");
         api("GET").then(function (r) {
           if (r.estado === 200 && r.cuerpo.html) {
-            pintar(leerServicios(r.cuerpo.html));
+            pintar(leerModelo(r.cuerpo.html));
             mostrar("editor");
             actualizar();
           } else if (r.estado === 401) {
@@ -459,22 +688,52 @@
       });
 
       $("[data-deshacer]").addEventListener("click", function () {
-        servicios.forEach(function (s) { s.input.value = formatear(s.precio); ajustar(s.input); });
+        servicios.forEach(function (s) {
+          if (s.precio) { s.precio.input.value = formatear(s.precio.base); ajustar(s.precio.input); }
+          ORDEN_CAMPOS.forEach(function (campo) {
+            if (!s.campos[campo]) return;
+            s.campos[campo].input.value = s.campos[campo].base;
+            crecer(s.campos[campo].input);
+          });
+          if (s.foto) s.foto.reiniciar();
+        });
+        fotosPagina.forEach(function (f) { f.reiniciar(); });
         actualizar();
       });
 
+      /* Arma la ventana de confirmación con cada cambio (y avisos de precios raros). */
       $("[data-guardar]").addEventListener("click", function () {
         var lista = pendientes();
         if (!lista.length) return;
         var resumen = $("[data-resumen]");
         resumen.textContent = "";
-        lista.forEach(function (s) {
-          var li = document.createElement("li");
-          li.innerHTML = "<span></span><span><s></s> → <strong></strong></span>";
-          $("span", li).textContent = s.nombre;
-          $("s", li).textContent = "$" + formatear(s.precio);
-          $("strong", li).textContent = "$" + formatear(numero(s.input.value));
-          resumen.appendChild(li);
+        var porElemento = {}; // un solo recuadro por servicio o foto, con todos sus cambios
+        lista.forEach(function (c) {
+          var clave = c.s ? "s:" + c.s.id : "f:" + c.foto.id;
+          var li = porElemento[clave];
+          if (!li) {
+            li = porElemento[clave] = crear("li", "", '<span class="r-titulo"></span>');
+            $(".r-titulo", li).textContent = c.s ? nombreActual(c.s) : (c.foto.etiqueta || c.foto.id);
+            resumen.appendChild(li);
+          }
+          var detalle = crear("span", "r-detalle");
+          li.appendChild(detalle);
+          if (c.tipo === "precio") {
+            detalle.innerHTML = "Precio: <s></s> → <strong></strong>";
+            $("s", detalle).textContent = "$" + formatear(c.antes);
+            $("strong", detalle).textContent = "$" + formatear(c.despues);
+            var extra = avisoPrecio(c.despues, c.antes);
+            if (extra) { var av = crear("span", "r-aviso"); av.textContent = "⚠ " + extra; li.appendChild(av); }
+          } else if (c.tipo === "texto") {
+            var etiqueta = ETIQUETAS[c.campo];
+            detalle.textContent = !c.despues ? etiqueta + ": se borra" : etiqueta + (c.antes ? ": «" : " (nueva): «") + resumir(c.despues, 90) + "»";
+          } else {
+            detalle.textContent = "Foto nueva";
+            var mini = crear("img");
+            mini.alt = "";
+            mini.src = c.foto.pendiente.url;
+            li.appendChild(mini);
+          }
         });
         dialogo.showModal();
       });
@@ -483,22 +742,41 @@
 
       $("[data-publicar]").addEventListener("click", function () {
         var lista = pendientes();
-        var cambios = {};
-        lista.forEach(function (s) { cambios[s.id] = numero(s.input.value); });
+        var pedido = { precios: {}, textos: {}, fotos: {} };
+        lista.forEach(function (c) {
+          if (c.tipo === "precio") pedido.precios[c.s.id] = c.despues;
+          else if (c.tipo === "texto") pedido.textos[c.s.id + ":" + c.campo] = c.despues;
+          else pedido.fotos[c.foto.id] = { datos: c.foto.pendiente.datos, alt: c.s ? nombreActual(c.s) : ALT_GENERAL };
+        });
+        var envio = JSON.stringify(pedido);
+        if (envio.length > ENVIO_MAX) {
+          dialogo.close();
+          estado("Son muchas fotos a la vez. Publica primero algunas y luego el resto.", "error");
+          return;
+        }
         var boton = this;
         boton.disabled = true;
         boton.textContent = "Publicando…";
-        api("POST", "guardar", { cambios: cambios }).then(function (r) {
+        api("POST", "guardar", pedido).then(function (r) {
           dialogo.close();
           if (r.estado === 401) {
             pedirLogin("Tu sesión terminó. Entra de nuevo y vuelve a tocar Guardar: tus cambios siguen ahí.");
             return;
           }
           if (r.estado !== 200) { estado(r.cuerpo.error || "No se pudo guardar. Intenta de nuevo.", "error"); return; }
-          lista.forEach(function (s) { s.precio = cambios[s.id]; });
+          var rutas = r.cuerpo.fotos || {};
+          lista.forEach(function (c) {
+            if (c.tipo === "precio") c.s.precio.base = c.despues;
+            else if (c.tipo === "texto") c.s.campos[c.campo].base = c.despues;
+            else if (rutas[c.foto.id]) {
+              c.foto.src = rutas[c.foto.id];
+              c.foto.previa = c.foto.pendiente.url; // la foto nueva tarda en estar en la página
+              c.foto.reiniciar();
+            }
+          });
           actualizar();
           estado("Guardado ✓ Publicando en la página…", "ok");
-          verificarPublicacion(cambios);
+          verificarPublicacion(pedido, rutas);
         }).catch(function () {
           dialogo.close();
           estado("No hay conexión. Revisa el internet e intenta de nuevo.", "error");
@@ -508,8 +786,8 @@
         });
       });
 
-      /* Revisa la página pública hasta que muestre los precios guardados. */
-      function verificarPublicacion(cambios) {
+      /* Revisa la página pública hasta que muestre todo lo guardado. */
+      function verificarPublicacion(pedido, rutas) {
         var mia = ++ronda;
         var inicio = Date.now();
         var avisar = function (texto) { if (mia === ronda && !pendientes().length) estado(texto, "ok"); };
@@ -520,10 +798,20 @@
         };
         var revisar = function () {
           fetch("/?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (html) {
-            var vivos = {};
-            leerServicios(html).forEach(function (s) { vivos[s.id] = s.precio; });
-            var listo = Object.keys(cambios).every(function (id) { return vivos[id] === cambios[id]; });
-            if (listo) avisar("Publicado ✓ Los precios nuevos ya están en la página.");
+            var vivo = leerModelo(html);
+            var porId = {};
+            vivo.servicios.forEach(function (s) { porId[s.id] = s; });
+            var fotosVivas = {};
+            vivo.fotos.forEach(function (f) { fotosVivas[f.id] = f.src; });
+            vivo.servicios.forEach(function (s) { if (s.foto) fotosVivas[s.id] = s.foto.src; });
+            var listo = Object.keys(pedido.precios).every(function (id) {
+              return porId[id] && porId[id].precio && porId[id].precio.base === pedido.precios[id];
+            }) && Object.keys(pedido.textos).every(function (clave) {
+              var partes = clave.split(":");
+              var s = porId[partes[0]];
+              return s && s.campos[partes[1]] && s.campos[partes[1]].base === pedido.textos[clave];
+            }) && Object.keys(rutas).every(function (id) { return fotosVivas[id] === rutas[id]; });
+            if (listo) avisar("Publicado ✓ Los cambios ya están en la página.");
             else seguir();
           }).catch(seguir);
         };
@@ -534,6 +822,7 @@
         if (pendientes().length && !confirm("Tienes cambios sin guardar. ¿Salir de todas formas?")) return;
         api("POST", "salir", {}).catch(function () {}).then(function () {
           servicios = [];
+          fotosPagina = [];
           ronda++;
           $("[data-grupos]").textContent = "";
           pedirLogin("");
