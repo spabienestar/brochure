@@ -8,6 +8,8 @@
 //   data-tarifa="id"                 precio del servicio (solo el texto del precio)
 //   data-texto="id:campo"            nombre, descripcion o detalle (solo texto y <br>)
 //   data-foto="id"                   foto (img, y también link/meta que deban seguirla)
+//   data-galeria="id"                hasta 3 fotos del servicio (solo etiquetas <img> dentro;
+//                                    src = foto que se muestra, data-grande = foto para ampliar)
 //
 // Variables de entorno (Vercel → Settings → Environment Variables):
 //   PANEL_USUARIO  usuario del panel
@@ -27,7 +29,9 @@ const DURACION_SESION = 8 * 60 * 60; // segundos
 const PRECIO_MIN = 1000;
 const PRECIO_MAX = 50000000;
 const FOTO_MAX_BYTES = 3 * 1024 * 1024;
+const MINI_MAX_BYTES = 600 * 1024;
 const FOTOS_POR_GUARDADO = 8;
+const FOTOS_POR_GALERIA = 3;
 const CAMPOS = {
   nombre: { max: 90, varias_lineas: false, obligatorio: true },
   detalle: { max: 90, varias_lineas: false, obligatorio: false },
@@ -40,6 +44,10 @@ const PATRON_TARIFA = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-tarifa="([a-z0-9-]+)"[^>
 const PATRON_TEXTO = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-texto="([a-z0-9-]+):(nombre|descripcion|detalle)"[^>]*>)((?:[^<]|<br\s*\/?>)*)(<\/\2>)/gi;
 // Etiqueta img/link/meta con data-foto="id".
 const PATRON_FOTO = /<(img|link|meta)\b[^>]*?\sdata-foto="([a-z0-9-]+)"[^>]*>/gi;
+// Contenedor data-galeria="id" cuyo contenido son solo etiquetas <img>.
+const PATRON_GALERIA = /(<div\b[^>]*?\sdata-galeria="([a-z0-9-]+)"[^>]*>)((?:<img\b[^>]*>)*)(<\/div>)/gi;
+// Ruta de una foto que ya está en el sitio.
+const PATRON_RUTA = /^assets\/img\/[a-z0-9._\/-]+\.jpg$/;
 
 function conEstado(estado, mensaje) {
   const error = new Error(mensaje);
@@ -182,17 +190,29 @@ function limpiarTexto(valor, campo) {
   return texto;
 }
 
+// Solo JPEG: el panel convierte y comprime todas las fotos antes de enviarlas.
+function jpegValido(base64, maximo) {
+  const bytes = Buffer.from(String(base64 || ""), "base64");
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) throw conEstado(400, "Una de las fotos no es una imagen válida.");
+  if (bytes.length > maximo) throw conEstado(400, "Una de las fotos es demasiado pesada.");
+  return bytes.toString("base64");
+}
+
 function validarPedido(cuerpo) {
   const precios = Object.create(null);
   const textos = Object.create(null);
   const fotos = Object.create(null);
+  const galerias = Object.create(null);
   const esObjeto = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
 
   // `cambios` es el nombre que usaba la primera versión del panel para los precios.
   const entradaPrecios = cuerpo.precios || cuerpo.cambios || {};
   const entradaTextos = cuerpo.textos || {};
   const entradaFotos = cuerpo.fotos || {};
-  if (!esObjeto(entradaPrecios) || !esObjeto(entradaTextos) || !esObjeto(entradaFotos)) throw conEstado(400, "Datos inválidos.");
+  const entradaGalerias = cuerpo.galerias || {};
+  if (!esObjeto(entradaPrecios) || !esObjeto(entradaTextos) || !esObjeto(entradaFotos) || !esObjeto(entradaGalerias)) {
+    throw conEstado(400, "Datos inválidos.");
+  }
 
   for (const [id, valor] of Object.entries(entradaPrecios)) {
     const precio = Number(valor);
@@ -206,19 +226,32 @@ function validarPedido(cuerpo) {
     if (!partes) throw conEstado(400, "Hay un texto no válido.");
     textos[clave] = limpiarTexto(valor, partes[2]);
   }
-  const idsFotos = Object.keys(entradaFotos);
-  if (idsFotos.length > FOTOS_POR_GUARDADO) throw conEstado(400, "Son muchas fotos a la vez. Guarda máximo " + FOTOS_POR_GUARDADO + ".");
-  for (const id of idsFotos) {
-    const foto = entradaFotos[id];
+  let nuevas = 0;
+  for (const [id, foto] of Object.entries(entradaFotos)) {
     if (!/^[a-z0-9-]+$/.test(id) || !esObjeto(foto) || typeof foto.datos !== "string") throw conEstado(400, "Hay una foto no válida.");
-    const bytes = Buffer.from(foto.datos, "base64");
-    // Solo JPEG: el panel convierte y comprime todas las fotos antes de enviarlas.
-    if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) throw conEstado(400, "Una de las fotos no es una imagen válida.");
-    if (bytes.length > FOTO_MAX_BYTES) throw conEstado(400, "Una de las fotos es demasiado pesada.");
-    fotos[id] = { datos: bytes.toString("base64"), alt: limpiarTexto(foto.alt, "detalle") };
+    fotos[id] = { datos: jpegValido(foto.datos, FOTO_MAX_BYTES), alt: limpiarTexto(foto.alt, "detalle") };
+    nuevas++;
   }
-  if (!Object.keys(precios).length && !Object.keys(textos).length && !idsFotos.length) throw conEstado(400, "No hay cambios para guardar.");
-  return { precios, textos, fotos };
+  for (const [id, galeria] of Object.entries(entradaGalerias)) {
+    if (!/^[a-z0-9-]+$/.test(id) || !esObjeto(galeria) || !Array.isArray(galeria.fotos)) throw conEstado(400, "Hay una galería no válida.");
+    if (galeria.fotos.length > FOTOS_POR_GALERIA) throw conEstado(400, "Cada servicio puede tener máximo " + FOTOS_POR_GALERIA + " fotos.");
+    const lista = galeria.fotos.map((foto) => {
+      if (!esObjeto(foto)) throw conEstado(400, "Hay una foto no válida.");
+      // Una foto que ya está en la galería se envía por su ruta; una nueva, con sus datos.
+      if (typeof foto.grande === "string") {
+        if (!PATRON_RUTA.test(foto.grande)) throw conEstado(400, "Hay una foto no válida.");
+        return { grande: foto.grande };
+      }
+      nuevas++;
+      return { datos: jpegValido(foto.datos, FOTO_MAX_BYTES), mini: foto.mini ? jpegValido(foto.mini, MINI_MAX_BYTES) : null };
+    });
+    const rutas = lista.filter((f) => f.grande).map((f) => f.grande);
+    if (new Set(rutas).size !== rutas.length) throw conEstado(400, "Una foto aparece repetida en la misma galería.");
+    galerias[id] = { alt: limpiarTexto(galeria.alt, "detalle") || "Olivé Spa", fotos: lista };
+  }
+  if (nuevas > FOTOS_POR_GUARDADO) throw conEstado(400, "Son muchas fotos a la vez. Guarda máximo " + FOTOS_POR_GUARDADO + ".");
+  if (![precios, textos, fotos, galerias].some((grupo) => Object.keys(grupo).length)) throw conEstado(400, "No hay cambios para guardar.");
+  return { precios, textos, fotos, galerias };
 }
 
 // Aplica el pedido sobre el HTML. Devuelve el HTML nuevo y una línea por cambio real.
@@ -261,33 +294,78 @@ function aplicar(html, pedido, rutasFotos) {
   });
   for (const id of Object.keys(rutasFotos)) lineas.push("- foto " + id + ": " + rutasFotos[id]);
 
+  const galerias = Object.create(null); // id -> fotos finales [{ grande, src }]
+  nuevo = nuevo.replace(PATRON_GALERIA, (todo, abre, id, contenido, cierra) => {
+    if (!(id in pedido.galerias)) return todo;
+    vistos.add("galeria:" + id);
+    // En las miniaturas (masajes, faciales) se muestra la versión pequeña; en las portadas, la grande.
+    const esMini = /\bgaleria-mini\b/.test(abre);
+    const actuales = new Map(); // foto grande -> foto que se muestra
+    for (const [etiqueta] of contenido.matchAll(/<img\b[^>]*>/gi)) {
+      const src = (/\ssrc="([^"]*)"/i.exec(etiqueta) || [])[1];
+      const grande = (/\sdata-grande="([^"]*)"/i.exec(etiqueta) || [])[1] || src;
+      if (grande) actuales.set(grande, src || grande);
+    }
+    const galeria = pedido.galerias[id];
+    const finales = galeria.fotos.map((foto) => {
+      if (foto.grande) {
+        if (!actuales.has(foto.grande)) throw conEstado(409, "Las fotos cambiaron mientras editabas. Recarga la página e intenta de nuevo.");
+        return { grande: foto.grande, src: actuales.get(foto.grande) };
+      }
+      return { grande: foto.nueva.grande, src: esMini && foto.nueva.mini ? foto.nueva.mini : foto.nueva.grande };
+    });
+    const alt = aHtml(galeria.alt);
+    const contenidoNuevo = finales.map((f) => '<img src="' + f.src + '" data-grande="' + f.grande + '" alt="' + alt + '" loading="lazy" decoding="async" />').join("");
+    const abreNuevo = abre.replace(/\sdata-cantidad="\d*"/i, ' data-cantidad="' + finales.length + '"');
+    galerias[id] = finales;
+    if (contenidoNuevo === contenido && abreNuevo === abre) return todo;
+    const nuevasAqui = galeria.fotos.filter((f) => !f.grande).length;
+    const mismasFotos = [...actuales.keys()].join("|") === finales.map((f) => f.grande).join("|");
+    lineas.push("- fotos " + id + ": " + (mismasFotos ? "texto alternativo" : finales.length + " foto(s)" + (nuevasAqui ? ", " + nuevasAqui + " nueva(s)" : "")));
+    return abreNuevo + contenidoNuevo + cierra;
+  });
+
   const faltan = [
     ...Object.keys(pedido.precios).filter((id) => !vistos.has("precio:" + id)),
     ...Object.keys(pedido.textos).filter((clave) => !vistos.has("texto:" + clave)),
-    ...Object.keys(rutasFotos).filter((id) => !vistos.has("foto:" + id))
+    ...Object.keys(rutasFotos).filter((id) => !vistos.has("foto:" + id)),
+    ...Object.keys(pedido.galerias).filter((id) => !vistos.has("galeria:" + id))
   ];
   if (faltan.length) throw conEstado(400, "No se encontraron estos elementos en la página: " + faltan.join(", "));
-  return { html: nuevo, lineas };
+  return { html: nuevo, lineas, galerias };
 }
 
 // Guarda todo en un solo commit con la API de datos de Git (blobs → árbol → commit → rama).
 async function publicar(cfg, pedido) {
   const sello = new Date().toISOString().replace(/\D/g, "").slice(0, 14) + "-" + crypto.randomBytes(2).toString("hex");
   const archivosFotos = [];
+  const subir = async (ruta, datos) => {
+    const blob = await github(cfg, "POST", "/git/blobs", { content: datos, encoding: "base64" });
+    archivosFotos.push({ path: ruta, mode: "100644", type: "blob", sha: blob.sha });
+    return ruta;
+  };
   const rutasFotos = Object.create(null);
   for (const [id, foto] of Object.entries(pedido.fotos)) {
-    const ruta = CARPETA_FOTOS + id + "-" + sello + ".jpg";
-    const blob = await github(cfg, "POST", "/git/blobs", { content: foto.datos, encoding: "base64" });
-    archivosFotos.push({ path: ruta, mode: "100644", type: "blob", sha: blob.sha });
-    rutasFotos[id] = ruta;
+    rutasFotos[id] = await subir(CARPETA_FOTOS + id + "-" + sello + ".jpg", foto.datos);
+  }
+  for (const [id, galeria] of Object.entries(pedido.galerias)) {
+    let n = 0;
+    for (const foto of galeria.fotos) {
+      if (foto.grande) continue;
+      const base = CARPETA_FOTOS + id + "-" + sello + "-" + ++n;
+      foto.nueva = {
+        grande: await subir(base + ".jpg", foto.datos),
+        mini: foto.mini ? await subir(base + "-mini.jpg", foto.mini) : null
+      };
+    }
   }
 
   for (let intento = 1; ; intento++) {
     const rama = await github(cfg, "GET", "/git/ref/heads/" + RAMA);
     const cabeza = rama.object.sha;
     const commitActual = await github(cfg, "GET", "/git/commits/" + cabeza);
-    const { html, lineas } = aplicar(await leerIndex(cfg, cabeza), pedido, rutasFotos);
-    if (!lineas.length) return { cambios: 0, fotos: {} };
+    const { html, lineas, galerias } = aplicar(await leerIndex(cfg, cabeza), pedido, rutasFotos);
+    if (!lineas.length) return { cambios: 0, fotos: {}, galerias: {} };
 
     const arbol = await github(cfg, "POST", "/git/trees", {
       base_tree: commitActual.tree.sha,
@@ -300,7 +378,7 @@ async function publicar(cfg, pedido) {
     });
     try {
       await github(cfg, "PATCH", "/git/refs/heads/" + RAMA, { sha: commit.sha, force: false });
-      return { cambios: lineas.length, fotos: rutasFotos };
+      return { cambios: lineas.length, fotos: rutasFotos, galerias };
     } catch (error) {
       // Otro cambio entró justo antes: se rehace sobre la versión nueva (las fotos ya subidas se reutilizan).
       if (error.estado === 409 && intento < 3) continue;

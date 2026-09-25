@@ -18,6 +18,7 @@ styles.css        ← estilos
 main.js           ← interacciones (nav, reveals, contadores)
 lib/              ← GSAP + ScrollTrigger + datos de marca
 assets/img/       ← fotografías (repositorios gratuitos, ver créditos)
+assets/img/servicios/ ← foto inicial de cada servicio (repositorios gratuitos, ver créditos)
 assets/img/panel/ ← fotos subidas desde el panel
 panel/            ← panel privado de administración (se abre en /tarifas)
 api/panel.js      ← función de Vercel que valida el acceso y guarda los cambios
@@ -38,10 +39,13 @@ Lo editable está marcado en `index.html`; lo que no lleve estas marcas no apare
 | `data-texto="id:nombre"` | nombre del servicio | solo texto |
 | `data-texto="id:descripcion"` | descripción (si queda vacía, no se muestra) | texto y `<br>` |
 | `data-texto="id:detalle"` | duración o detalle | solo texto |
-| `data-foto="id"` | foto (`img`; también el `link` de precarga y el `og:image` de la portada) | — |
+| `data-foto="id"` | foto de una sección (`img`; también el `link` de precarga y el `og:image` de la portada) | — |
+| `data-galeria="id"` | hasta 3 fotos del servicio; la primera es la principal | solo `<img>` con `src` (la que se ve) y `data-grande` (la que se abre en grande) |
 
-- Un servicio nuevo necesita su `data-tarifa` y sus `data-texto` con el mismo `id`; una foto de sección lleva además `data-foto-etiqueta` con el nombre que se ve en el panel.
-- El panel convierte las fotos a JPEG liviano (máx. 1800 px) antes de subirlas.
+- Un servicio nuevo necesita su `data-tarifa`, sus `data-texto` y su `data-galeria` con el mismo `id`; una foto de sección lleva además `data-foto-etiqueta` con el nombre que se ve en el panel.
+- Galerías: `galeria-mini` (masajes y faciales) muestra una miniatura con contador y usa la versión `-mini.jpg`; `galeria-portada` (programas y post-quirúrgico) es una portada deslizable con puntos. En ambas, tocar la foto abre el visor en grande (`main.js`).
+- El panel convierte las fotos a JPEG liviano (grande máx. 1400 px y miniatura máx. 480 px) antes de subirlas.
+- Si se agrega una foto de un repositorio gratuito, su crédito va en `creditos.html` y `assets/credits.json`.
 - El panel también hace commits en `main`: haz `git pull` antes de editar en local.
 
 Variables de entorno en Vercel (Settings → Environment Variables, entorno Production):

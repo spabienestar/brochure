@@ -721,6 +721,140 @@ ul, ol { list-style: none; padding: 0; }
 }
 
 /* =============================================================
+   12b. Fotos por servicio (hasta 3, editables desde /tarifas)
+   ============================================================= */
+.galeria:empty { display: none; }
+.galeria img { cursor: zoom-in; }
+
+/* Masajes y faciales: miniatura a la izquierda; si hay más fotos, un contador */
+.galeria-mini {
+  position: relative;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(44, 42, 34, 0.16);
+  cursor: zoom-in;
+}
+.galeria-mini img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
+.galeria-mini img + img { display: none; }
+.galeria-mini:hover img { transform: scale(1.08); }
+.galeria-mini[data-cantidad="2"]::after,
+.galeria-mini[data-cantidad="3"]::after {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: rgba(44, 42, 34, 0.72);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.galeria-mini[data-cantidad="2"]::after { content: "+1"; }
+.galeria-mini[data-cantidad="3"]::after { content: "+2"; }
+.menu-list li { display: flex; align-items: center; gap: 0.9rem; }
+.menu-item { flex: 1; min-width: 0; }
+.feature-list li { display: flex; align-items: flex-start; gap: 1rem; }
+.feature-list .galeria-mini { width: 72px; height: 72px; margin-top: 0.15rem; }
+.feature-body { flex: 1; min-width: 0; }
+
+/* Programas y post-quirúrgico: portada que se desliza entre sus fotos */
+.galeria-portada {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.galeria-portada::-webkit-scrollbar { display: none; }
+.galeria-portada img,
+.program-card-photo .galeria-portada img {
+  flex: 0 0 100%;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  scroll-snap-align: start;
+  transition: none;
+}
+.program-card-photo:hover .galeria-portada img { transform: none; }
+.galeria-puntos {
+  position: relative;
+  z-index: 2;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  transform: translateY(-22px);
+}
+.galeria-puntos button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.7);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: width 0.3s var(--ease-out), background 0.3s;
+}
+.galeria-puntos button.activo { width: 20px; background: var(--paper); }
+.post-card-photo { padding: 0; overflow: hidden; }
+.post-body { padding: 1.8rem 1.8rem 2rem; }
+@media (min-width: 720px) {
+  .program-card-wide.program-card-photo { display: grid; grid-template-columns: 1fr 1fr; }
+  .program-card-wide .galeria-portada img { aspect-ratio: auto; height: 100%; min-height: 280px; }
+}
+
+/* Visor de fotos en grande */
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 3.5rem 1rem 4.5rem;
+  background: rgba(20, 19, 15, 0.92);
+}
+.visor[hidden] { display: none; }
+.visor img {
+  max-width: min(1100px, 100%);
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.visor-pie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1.4rem;
+  text-align: center;
+  color: rgba(255, 253, 248, 0.85);
+  font-size: 0.85rem;
+}
+.visor button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 253, 248, 0.14);
+  color: var(--paper);
+  font-size: 1.6rem;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.visor button:hover { background: rgba(255, 253, 248, 0.26); }
+.visor-cerrar { top: 0.9rem; right: 0.9rem; }
+.visor-ant { left: 0.9rem; top: 50%; transform: translateY(-50%); }
+.visor-sig { right: 0.9rem; top: 50%; transform: translateY(-50%); }
+.visor[data-una] .visor-ant,
+.visor[data-una] .visor-sig { display: none; }
+
+/* =============================================================
    13. Cómo funciona
    ============================================================= */
 .steps-grid {
