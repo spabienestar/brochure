@@ -13,6 +13,13 @@
   function initNav() {
     var nav = $("[data-nav]");
     if (!nav) return;
+    // Alto real de la franja de aviso (puede ocupar dos líneas en el celular).
+    var aviso = $(".aviso", nav);
+    if (aviso) {
+      var medir = function () { document.documentElement.style.setProperty("--aviso-h", aviso.offsetHeight + "px"); };
+      medir();
+      window.addEventListener("resize", medir, { passive: true });
+    }
     var onScroll = function () {
       nav.classList.toggle("is-solid", window.scrollY > 24);
     };
@@ -46,7 +53,8 @@
       var el = document.querySelector(id);
       if (!el) return;
       e.preventDefault();
-      var top = el.getBoundingClientRect().top + window.scrollY - 70;
+      var nav = $("[data-nav]");
+      var top = el.getBoundingClientRect().top + window.scrollY - (nav ? nav.offsetHeight - 8 : 70);
       window.scrollTo({ top: top, behavior: reduced ? "auto" : "smooth" });
     });
   }
@@ -115,11 +123,12 @@
     }, 6000);
   }
 
-  /* ---------- Fotos por servicio: puntos en las portadas + visor en grande ---------- */
+  /* ---------- Fotos y videos por servicio: puntos en las portadas + visor en grande ---------- */
   function initGalerias() {
     var galerias = $$("[data-galeria]");
-    if (!galerias.length) return;
-    var fotosDe = function (g) { return $$("img", g); };
+    var tarjetasVideo = $$(".video-card");
+    if (!galerias.length && !tarjetasVideo.length) return;
+    var fotosDe = function (g) { return $$(".media", g); };
     var actual = function (g) { return g.clientWidth ? Math.round(g.scrollLeft / g.clientWidth) : 0; };
 
     galerias.forEach(function (g) {
@@ -149,26 +158,42 @@
     visor.hidden = true;
     visor.setAttribute("role", "dialog");
     visor.setAttribute("aria-modal", "true");
-    visor.setAttribute("aria-label", "Fotos del servicio");
+    visor.setAttribute("aria-label", "Fotos y videos");
     visor.innerHTML =
       '<img alt="" />' +
+      '<iframe hidden title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>' +
       '<button class="visor-cerrar" type="button" aria-label="Cerrar">×</button>' +
-      '<button class="visor-ant" type="button" aria-label="Foto anterior">‹</button>' +
-      '<button class="visor-sig" type="button" aria-label="Foto siguiente">›</button>' +
+      '<button class="visor-ant" type="button" aria-label="Anterior">‹</button>' +
+      '<button class="visor-sig" type="button" aria-label="Siguiente">›</button>' +
       '<p class="visor-pie" aria-live="polite"></p>';
     document.body.appendChild(visor);
     var imagen = $("img", visor);
+    var marco = $("iframe", visor);
     var pie = $(".visor-pie", visor);
     var lista = [];
     var indice = 0;
     var previo = null;
 
+    // Cada elemento es una foto (img con data-grande) o un video (data-video con la dirección para incrustar).
     function mostrarFoto(i) {
       indice = (i + lista.length) % lista.length;
       var f = lista[indice];
-      imagen.src = f.getAttribute("data-grande") || f.getAttribute("src");
-      imagen.alt = f.alt;
-      pie.textContent = f.alt + (lista.length > 1 ? " · " + (indice + 1) + " / " + lista.length : "");
+      var video = f.getAttribute("data-video");
+      var texto = f.getAttribute("alt") || f.getAttribute("aria-label") || "";
+      if (video) {
+        imagen.hidden = true;
+        imagen.removeAttribute("src");
+        marco.className = (f.hasAttribute("data-vertical") ? "vertical " : "") + (f.getAttribute("data-plataforma") || "");
+        if (marco.getAttribute("src") !== video) marco.src = video;
+        marco.hidden = false;
+      } else {
+        marco.hidden = true;
+        marco.removeAttribute("src");
+        imagen.src = f.getAttribute("data-grande") || f.getAttribute("src");
+        imagen.alt = texto;
+        imagen.hidden = false;
+      }
+      pie.textContent = texto.replace(/^Ver video:?\s*/, "") + (lista.length > 1 ? " · " + (indice + 1) + " / " + lista.length : "");
     }
     function abrir(fotos, i) {
       lista = fotos;
@@ -182,10 +207,14 @@
     function cerrar() {
       visor.hidden = true;
       imagen.removeAttribute("src");
+      marco.removeAttribute("src"); // detiene el video
       document.documentElement.style.overflow = "";
       if (previo && previo.focus) previo.focus();
     }
 
+    tarjetasVideo.forEach(function (tarjeta, i) {
+      tarjeta.addEventListener("click", function () { abrir(tarjetasVideo, i); });
+    });
     galerias.forEach(function (g) {
       var abrirDesde = function (objetivo) {
         var fotos = fotosDe(g);
@@ -193,7 +222,7 @@
         var i = g.classList.contains("galeria-portada") ? actual(g) : Math.max(0, fotos.indexOf(objetivo));
         abrir(fotos, i);
       };
-      g.addEventListener("click", function (e) { abrirDesde(e.target.closest("img")); });
+      g.addEventListener("click", function (e) { abrirDesde(e.target.closest(".media")); });
       g.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrirDesde(null); }
       });

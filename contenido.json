@@ -1,0 +1,600 @@
+{
+  "version": 1,
+  "aviso": {
+    "visible": false,
+    "texto": ""
+  },
+  "portada": {
+    "etiqueta": "Spa a domicilio · Medellín y el Valle de Aburrá",
+    "titulo": "Vive la relajación,",
+    "destacado": "donde te encuentres.",
+    "texto": "Llevamos el spa hasta la puerta de tu casa: terapeutas certificados, aromas, música y todo lo necesario para que solo te ocupes de disfrutar.",
+    "lema": "Paz, sabiduría y renovación — donde el cuerpo, la mente y el alma encuentran armonía.",
+    "boton": "Reservar por WhatsApp",
+    "foto": {
+      "grande": "assets/img/hero-masaje.jpg",
+      "alt": "Masaje de relajación en pareja sobre toallas blancas"
+    }
+  },
+  "cinta": {
+    "frases": [
+      "Masajes de relajación",
+      "Tratamientos faciales",
+      "Programas spa en pareja",
+      "Post-quirúrgico",
+      "A domicilio"
+    ]
+  },
+  "nosotros": {
+    "etiqueta": "Nuestra esencia",
+    "titulo": "El spa viene",
+    "destacado": "a ti",
+    "texto": "Una misión clara: llevarte la experiencia completa de un spa directamente a la puerta de tu casa, con la misma calidad, calidez y profesionalismo que encontrarías en los mejores centros de la ciudad.",
+    "cifras": [
+      {
+        "numero": 30,
+        "texto": "años de experiencia",
+        "mas": true,
+        "auto": false
+      },
+      {
+        "numero": 0,
+        "texto": "rituales y terapias",
+        "mas": false,
+        "auto": true
+      },
+      {
+        "numero": 5,
+        "texto": "zonas de cobertura",
+        "mas": false,
+        "auto": false
+      }
+    ],
+    "cobertura": "Medellín (El Poblado, Laureles) · Envigado · Sabaneta y municipios aledaños del Valle de Aburrá",
+    "foto": {
+      "grande": "assets/img/detalle-piedras.jpg",
+      "alt": "Corazón formado con piedras de colores sobre arena"
+    }
+  },
+  "masajes": {
+    "visible": true,
+    "menu": "Masajes",
+    "etiqueta": "Masajes de relajación",
+    "titulo": "Terapias que estimulan",
+    "destacado": "los sentidos",
+    "intro": "Estimula los sentidos, renueva y purifica el cuerpo con nuestras terapias. Cada masaje dura 1 hora.",
+    "regalo": "todos los masajes llevan masaje facial",
+    "boton": "Reservar un masaje",
+    "mensaje": "Hola, Olivé Spa 🌿 Quiero reservar un masaje a domicilio.",
+    "servicios": [
+      {
+        "id": "masaje-relajacion-profunda",
+        "nombre": "Masaje Relajación Profunda",
+        "etiqueta": "favorito",
+        "precio": 220000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/servicios/masaje-relajacion-profunda.jpg",
+            "alt": "Masaje Relajación Profunda",
+            "mini": "assets/img/servicios/masaje-relajacion-profunda-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-piedras-volcanicas",
+        "nombre": "Masaje Terapéutico con Piedras Volcánicas",
+        "etiqueta": "",
+        "precio": 230000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-piedras-volcanicas-20261014220955-837e-1.jpg",
+            "alt": "Masaje Terapéutico con Piedras Volcánicas",
+            "mini": "assets/img/panel/masaje-piedras-volcanicas-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-coconut",
+        "nombre": "Masaje Coconut (nuez de coco)",
+        "etiqueta": "",
+        "precio": 230000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-coconut-20261014220955-837e-1.jpg",
+            "alt": "Masaje Coconut (nuez de coco)",
+            "mini": "assets/img/panel/masaje-coconut-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-bambu",
+        "nombre": "Masaje Bambú",
+        "etiqueta": "",
+        "precio": 230000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-bambu-20261014220955-837e-1.jpg",
+            "alt": "Masaje Bambú",
+            "mini": "assets/img/panel/masaje-bambu-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-tejido-profundo",
+        "nombre": "Masaje de Tejido Profundo",
+        "etiqueta": "",
+        "precio": 245000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-tejido-profundo-20261015041839-c3ba-1.jpg",
+            "alt": "Masaje de Tejido Profundo",
+            "mini": "assets/img/panel/masaje-tejido-profundo-20261015041839-c3ba-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "drenaje-linfatico-manual",
+        "nombre": "Drenaje Linfático Manual (DLM)",
+        "etiqueta": "",
+        "precio": 290000,
+        "descripcion": "1 hora y 30 minutos",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/drenaje-linfatico-manual-20261014222613-39e3-1.jpg",
+            "alt": "Drenaje Linfático Manual (DLM)",
+            "mini": "assets/img/panel/drenaje-linfatico-manual-20261014222613-39e3-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-sensorial",
+        "nombre": "Masaje Sensorial (vela termal)",
+        "etiqueta": "",
+        "precio": 245000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-sensorial-20261014220955-837e-1.jpg",
+            "alt": "Masaje Sensorial (vela termal)",
+            "mini": "assets/img/panel/masaje-sensorial-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-deportivo",
+        "nombre": "Masaje Deportivo",
+        "etiqueta": "",
+        "precio": 245000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-deportivo-20261014222034-ba41-1.jpg",
+            "alt": "Masaje Deportivo",
+            "mini": "assets/img/panel/masaje-deportivo-20261014222034-ba41-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-piernas-cansadas",
+        "nombre": "Masaje de relajación profunda mas turco",
+        "etiqueta": "",
+        "precio": 250000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-piernas-cansadas-20261014222034-ba41-1.jpg",
+            "alt": "Masaje de relajación profunda mas turco",
+            "mini": "assets/img/panel/masaje-piernas-cansadas-20261014222034-ba41-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-relajacion-hidratacion-facial",
+        "nombre": "Masaje de Relajación con Hidratación Facial",
+        "etiqueta": "",
+        "precio": 250000,
+        "descripcion": "Cambios confirmados",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-relajacion-hidratacion-facial-20260926042613-c0b6-1.jpg",
+            "alt": "Masaje de Relajación con Hidratación Facial",
+            "mini": "assets/img/panel/masaje-relajacion-hidratacion-facial-20260926042613-c0b6-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-localizado-exfoliacion",
+        "nombre": "Masaje Localizado (espalda) con Exfoliación Corporal",
+        "etiqueta": "",
+        "precio": 250000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-localizado-exfoliacion-20261014220955-837e-1.jpg",
+            "alt": "Masaje Localizado (espalda) con Exfoliación Corporal",
+            "mini": "assets/img/panel/masaje-localizado-exfoliacion-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-descontracturante",
+        "nombre": "Masaje Descontracturante",
+        "etiqueta": "",
+        "precio": 250000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-descontracturante-20261014224217-3dc0-1.jpg",
+            "alt": "Masaje Descontracturante",
+            "mini": "assets/img/panel/masaje-descontracturante-20261014224217-3dc0-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-en-pareja",
+        "nombre": "Masaje en Pareja con Aceites Tibios",
+        "etiqueta": "en pareja",
+        "precio": 390000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-en-pareja-20261014224217-3dc0-1.jpg",
+            "alt": "Masaje en Pareja con Aceites Tibios",
+            "mini": "assets/img/panel/masaje-en-pareja-20261014224217-3dc0-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "masaje-cuatro-manos",
+        "nombre": "Masaje a Cuatro Manos",
+        "etiqueta": "",
+        "precio": 390000,
+        "descripcion": "",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/masaje-cuatro-manos-20261014220955-837e-1.jpg",
+            "alt": "Masaje a Cuatro Manos",
+            "mini": "assets/img/panel/masaje-cuatro-manos-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  "faciales": {
+    "visible": true,
+    "menu": "Faciales",
+    "etiqueta": "Área facial",
+    "titulo": "Renueva e hidrata",
+    "destacado": "tu piel",
+    "intro": "Tratamientos faciales no invasivos que trabajan rostro, cuello y escote.",
+    "regalo": "todos los faciales llevan masaje en los pies",
+    "foto": {
+      "grande": "assets/img/facial-mascarilla.jpg",
+      "alt": "Aplicación de mascarilla facial con brocha en un spa"
+    },
+    "servicios": [
+      {
+        "id": "facial-limpieza-profunda",
+        "nombre": "Limpieza Facial Profunda con Máscara LED",
+        "precio": 255000,
+        "descripcion": "Elimina puntos negros e impurezas, renueva las células, minimiza los poros e hidrata la piel. Incluye drenaje facial.",
+        "detalle": "1 hora",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/facial-limpieza-profunda-20261015041839-c3ba-1.jpg",
+            "alt": "Limpieza Facial Profunda con Máscara LED",
+            "mini": "assets/img/panel/facial-limpieza-profunda-20261015041839-c3ba-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "facial-rejuvenecimiento-exosomas",
+        "nombre": "Rejuvenecimiento con Exosomas Vegetales y PDRN de Salmón",
+        "precio": 350000,
+        "descripcion": "Regeneración celular intensiva que une naturaleza y biotecnología marina para devolver firmeza y frescura.",
+        "detalle": "1 h 30 min",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/facial-rejuvenecimiento-exosomas-20261015042329-c6e5-1.jpg",
+            "alt": "Rejuvenecimiento con Exosomas Vegetales y PDRN de Salmón",
+            "mini": "assets/img/panel/facial-rejuvenecimiento-exosomas-20261015042329-c6e5-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "facial-piel-de-porcelana",
+        "nombre": "Piel de Porcelana con Máscara LED",
+        "precio": 290000,
+        "descripcion": "Tonalidad uniforme, tersura y luminosidad: máscara LED y masaje facial para un acabado radiante.",
+        "detalle": "1 hora",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/facial-piel-de-porcelana-20261015041839-c3ba-1.jpg",
+            "alt": "Piel de Porcelana con Máscara LED",
+            "mini": "assets/img/panel/facial-piel-de-porcelana-20261015041839-c3ba-1-mini.jpg"
+          }
+        ]
+      },
+      {
+        "id": "facial-elixir-hidratacion",
+        "nombre": "Elixir de Hidratación con Máscara LED",
+        "precio": 320000,
+        "descripcion": "Vitaminas y minerales sin cirugía en seis fases, para cada tipo de piel.",
+        "detalle": "1 hora",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/facial-elixir-hidratacion-20261014220955-837e-1.jpg",
+            "alt": "Elixir de Hidratación con Máscara LED",
+            "mini": "assets/img/panel/facial-elixir-hidratacion-20261014220955-837e-1-mini.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  "programas": {
+    "visible": true,
+    "menu": "Programas",
+    "etiqueta": "Programas spa",
+    "titulo": "Rituales para celebrar",
+    "destacado": "y compartir",
+    "intro": "Experiencias diseñadas para relajar el cuerpo, renovar la mente y consentir los sentidos con rituales exclusivos de bienestar.",
+    "servicios": [
+      {
+        "id": "programa-vino-uvas-pasion",
+        "nombre": "Vino, Uvas y Pasión",
+        "precio": 450000,
+        "nota": "",
+        "detalle": "En pareja · 2 horas · a base de uva",
+        "descripcion": "Masaje con aceites tibios de uva, exfoliación corporal con semillas y extracto de uva, e hidroterapia con sales de uva, aromas y espumas. Incluye uvas frescas, dos copas de vino y decoración romántica con pétalos y velas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-vino-uvas-pasion-20261014222613-39e3-1.jpg",
+            "alt": "Vino, Uvas y Pasión"
+          }
+        ]
+      },
+      {
+        "id": "programa-dulce-amor",
+        "nombre": "Dulce Amor",
+        "precio": 620000,
+        "nota": "",
+        "detalle": "En pareja · 3 horas · a base de chocolate",
+        "descripcion": "Masaje con piedras volcánicas, hidratación y exfoliación facial con chocolate, mascarilla de cacao, masaje facial e hidroterapia con sales de chocolate, esencias y espumas. Incluye fresas con chocolate, dos copas de vino y decoración romántica con pétalos y velas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-dulce-amor-20261015043711-b1f0-1.jpg",
+            "alt": "Dulce Amor"
+          }
+        ]
+      },
+      {
+        "id": "programa-coco-velvet",
+        "nombre": "Elixir Tropical",
+        "precio": 990000,
+        "nota": "",
+        "detalle": "En pareja · 4 horas · frutas tropicales",
+        "descripcion": "Limpieza facial profunda, masaje coconut con aceite de frutas tropicales, exfoliación corporal con frutas tropicales e hidroterapia con sales tropicales, esencias y espumas. Incluye frutas tropicales, dos copas de vino y decoración con pétalos y velas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-coco-velvet-20261015051027-1a33-1.jpg",
+            "alt": "Elixir Tropical"
+          }
+        ]
+      },
+      {
+        "id": "programa-activando-mi-energia",
+        "nombre": "Activando mi Energía",
+        "precio": 485000,
+        "nota": "",
+        "detalle": "Individual · 3 horas · a base de café",
+        "descripcion": "Masaje con piedras volcánicas, limpieza facial profunda e hidroterapia con sales a base de café, aromas y espumas. Incluye copa de vino y decoración con pétalos y velas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-activando-mi-energia-20261014225345-518b-1.jpg",
+            "alt": "Activando mi Energía"
+          }
+        ]
+      },
+      {
+        "id": "programa-abrazo-de-luz",
+        "nombre": "Spa Novia",
+        "precio": 450000,
+        "nota": "",
+        "detalle": "Individual · 2 horas · extractos naturales",
+        "descripcion": "Para lucir radiante en tu gran día: masaje hidratante con vela termal, exfoliación corporal y facial, hidratación facial, mascarilla velo de ácido hialurónico e hidroterapia con sales minerales, aromas y espumas. Incluye copa de vino y decoración con pétalos y velas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-abrazo-de-luz-20261014221030-1b61-1.jpg",
+            "alt": "Spa Novia"
+          }
+        ]
+      },
+      {
+        "id": "programa-hombre-fortaleza",
+        "nombre": "Hombre: Fortaleza y Equilibrio",
+        "precio": 320000,
+        "nota": "",
+        "detalle": "Individual · 2 horas",
+        "descripcion": "Masaje de tejido profundo de hora y media e hidroterapia con sales minerales, esencias y espumas, para desconectarse del estrés. Incluye copa de vino y decoración de flores margaritas.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-hombre-fortaleza-20261014222758-1c36-1.jpg",
+            "alt": "Hombre: Fortaleza y Equilibrio"
+          }
+        ]
+      },
+      {
+        "id": "programa-spa-entre-amigas",
+        "nombre": "Spa entre Amigas",
+        "precio": 220000,
+        "nota": "por persona",
+        "detalle": "Mínimo 6 amigas · 2 horas",
+        "descripcion": "Masaje de relajación profunda, envoltura corporal, hidratación facial, mascarilla velo de colágeno e hidroterapia con sales minerales, aromas y espumas. Incluye botella de vino, fresas con chocolate, sándwich y jugo de naranja. Ideal para celebrar y crear recuerdos.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/programa-spa-entre-amigas-20261019041302-a820-1.jpg",
+            "alt": "Spa entre Amigas"
+          }
+        ]
+      }
+    ]
+  },
+  "postquirurgico": {
+    "visible": true,
+    "menu": "Post-quirúrgico",
+    "etiqueta": "Terapias corporales y post-quirúrgico",
+    "titulo": "Recuperación con",
+    "destacado": "aparatología",
+    "intro": "Tratamientos que favorecen la recuperación postquirúrgica, reducen la inflamación, estimulan la circulación y ayudan a moldear la silueta. Cada sesión dura 1 hora.",
+    "servicios": [
+      {
+        "id": "post-ultrasonido-drenaje",
+        "nombre": "Ultrasonido con Drenaje Linfático Manual",
+        "precio": 220000,
+        "descripcion": "Protocolo post-quirúrgico para reducir inflamación y favorecer la recuperación de los tejidos.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/post-ultrasonido-drenaje-20261014225700-eb27-1.jpg",
+            "alt": "Ultrasonido con Drenaje Linfático Manual"
+          }
+        ]
+      },
+      {
+        "id": "post-radiofrecuencia-drenaje",
+        "nombre": "Tonifica con Radiofrecuencia y Drenaje Manual",
+        "precio": 220000,
+        "descripcion": "Reafirma la piel y estimula el colágeno combinando tecnología estética y drenaje.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/servicios/post-radiofrecuencia-drenaje.jpg",
+            "alt": "Tonifica con Radiofrecuencia y Drenaje Manual"
+          }
+        ]
+      },
+      {
+        "id": "post-moldea-silueta",
+        "nombre": "Moldea tu Silueta con Masaje de Reducción",
+        "precio": 220000,
+        "descripcion": "Masaje reductor con drenaje manual para ayudar a definir y moldear la figura.",
+        "medios": [
+          {
+            "tipo": "foto",
+            "grande": "assets/img/panel/post-moldea-silueta-20261014221030-1b61-1.jpg",
+            "alt": "Moldea tu Silueta con Masaje de Reducción"
+          }
+        ]
+      }
+    ]
+  },
+  "videos": {
+    "visible": true,
+    "menu": "Videos",
+    "etiqueta": "En video",
+    "titulo": "Vive la experiencia",
+    "destacado": "Olivé",
+    "intro": "",
+    "lista": []
+  },
+  "pasos": {
+    "visible": true,
+    "etiqueta": "Así de fácil",
+    "titulo": "Tu spa en",
+    "destacado": "tres pasos",
+    "lista": [
+      {
+        "titulo": "Reserva",
+        "texto": "Escríbenos por WhatsApp, elige tu ritual y agenda el día y la hora que prefieras."
+      },
+      {
+        "titulo": "Llegamos a ti",
+        "texto": "Nuestro equipo llega a tu casa con camilla, aromas, música y todo lo necesario."
+      },
+      {
+        "titulo": "Solo disfruta",
+        "texto": "Desconéctate del mundo sin salir de casa. Nosotros nos encargamos del resto."
+      }
+    ]
+  },
+  "reserva": {
+    "etiqueta": "Reserva tu experiencia",
+    "titulo": "Tu casa,",
+    "destacado": "tu spa.",
+    "texto": "Agenda hoy y déjanos llevar el bienestar hasta tu puerta.",
+    "foto": {
+      "grande": "assets/img/ritual-velas.jpg",
+      "alt": ""
+    }
+  },
+  "contacto": {
+    "whatsapp": "573232885910",
+    "whatsapp_2": "573001054987",
+    "mensaje": "Hola, Olivé Spa 🌿 Quiero reservar una experiencia de spa a domicilio.",
+    "email": "bienestarencasa2013@gmail.com",
+    "horarios": [
+      {
+        "dias": "Lunes a sábado",
+        "corto": "Lun – Sáb",
+        "horas": "10:00 a.m. – 7:00 p.m."
+      },
+      {
+        "dias": "Domingos y festivos",
+        "corto": "Dom y festivos",
+        "horas": "10:00 a.m. – 4:00 p.m."
+      }
+    ],
+    "instagram": "https://www.instagram.com/spamedellin_oficial",
+    "facebook": "https://www.facebook.com/share/18Qb4jLNsf/",
+    "tiktok": "https://www.tiktok.com/@spamedellinoficial",
+    "cobertura": [
+      "Medellín",
+      "El Poblado",
+      "Laureles",
+      "Envigado",
+      "Sabaneta",
+      "Municipios aledaños"
+    ]
+  },
+  "marca": {
+    "nombre": "Olivé Spa",
+    "lema": "experiencia a domicilio",
+    "mision": "La experiencia completa de un spa, directamente en la puerta de tu casa."
+  },
+  "sitio": {
+    "titulo": "Olivé Spa — Spa a domicilio en Medellín · Masajes, faciales y rituales",
+    "descripcion": "Olivé Spa: vive la relajación donde te encuentres. Llevamos el spa hasta la puerta de tu casa: masajes, tratamientos faciales, programas spa en pareja y terapias post-quirúrgicas en Medellín (El Poblado, Laureles), Envigado y Sabaneta.",
+    "compartir_titulo": "Olivé Spa — Spa a domicilio en Medellín",
+    "compartir_descripcion": "Olivé Spa: vive la relajación donde te encuentres. Masajes, faciales y rituales de bienestar a domicilio en Medellín y el Valle de Aburrá."
+  }
+}

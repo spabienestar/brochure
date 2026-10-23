@@ -669,8 +669,13 @@ ul, ol { list-style: none; padding: 0; }
 }
 .program-card-wide { grid-column: 1 / -1; }
 
-/* Textos editables desde el panel (/tarifas): si quedan vacíos, no ocupan espacio */
-[data-texto]:empty { display: none; }
+/* Textos opcionales que se editan desde el panel (/tarifas): si quedan vacíos, no ocupan espacio */
+.menu-desc:empty,
+.program-meta:empty,
+.program-body > p:empty,
+.post-body > p:empty,
+.feature-body p > span:empty,
+.feature-body small:empty { display: none; }
 
 /* =============================================================
    12. Post-quirúrgico
@@ -724,7 +729,39 @@ ul, ol { list-style: none; padding: 0; }
    12b. Fotos por servicio (hasta 3, editables desde /tarifas)
    ============================================================= */
 .galeria:empty { display: none; }
-.galeria img { cursor: zoom-in; }
+.galeria .media { cursor: zoom-in; }
+
+/* Un video dentro de una galería: su portada (o un fondo de marca) con un botón de play */
+.media-video {
+  display: block;
+  position: relative;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)) center / cover no-repeat;
+}
+.media-video::after,
+.video-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 253, 248, 0.94) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236f6b3f' d='M8 5v14l11-7z'/%3E%3C/svg%3E") 55% 50% / 20px no-repeat;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  transition: transform 0.3s var(--ease-out);
+}
+.media-video:not([style])::before,
+.video-card:not([style])::before {
+  content: attr(data-plataforma);
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  color: rgba(255, 253, 248, 0.92);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 
 /* Masajes y faciales: miniatura a la izquierda; si hay más fotos, un contador */
 .galeria-mini {
@@ -737,9 +774,14 @@ ul, ol { list-style: none; padding: 0; }
   box-shadow: 0 6px 16px rgba(44, 42, 34, 0.16);
   cursor: zoom-in;
 }
-.galeria-mini img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
-.galeria-mini img + img { display: none; }
-.galeria-mini:hover img { transform: scale(1.08); }
+.galeria-mini .media { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
+.galeria-mini .media + .media { display: none; }
+.galeria-mini:hover .media { transform: scale(1.08); }
+.galeria-mini .media-video::before { display: none; }
+/* Las portadas de YouTube traen franjas negras arriba y abajo: se recortan */
+.galeria-mini .media-video[data-plataforma="youtube"],
+.video-card[data-plataforma="youtube"] { background-size: auto 134%; }
+.galeria-mini .media-video::after { width: 26px; height: 26px; background-size: 12px; }
 .galeria-mini[data-cantidad="2"]::after,
 .galeria-mini[data-cantidad="3"]::after {
   position: absolute;
@@ -771,7 +813,7 @@ ul, ol { list-style: none; padding: 0; }
   overscroll-behavior-x: contain;
 }
 .galeria-portada::-webkit-scrollbar { display: none; }
-.galeria-portada img,
+.galeria-portada .media,
 .program-card-photo .galeria-portada img {
   flex: 0 0 100%;
   width: 100%;
@@ -804,7 +846,63 @@ ul, ol { list-style: none; padding: 0; }
 .post-body { padding: 1.8rem 1.8rem 2rem; }
 @media (min-width: 720px) {
   .program-card-wide.program-card-photo { display: grid; grid-template-columns: 1fr 1fr; }
-  .program-card-wide .galeria-portada img { aspect-ratio: auto; height: 100%; min-height: 280px; }
+  .program-card-wide .galeria-portada .media { aspect-ratio: auto; height: 100%; min-height: 280px; }
+}
+
+/* Franja de aviso o promoción (arriba, dentro del encabezado fijo) */
+.aviso {
+  padding: 0.45rem 1rem;
+  background: var(--accent);
+  color: var(--paper);
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+.con-aviso .hero { padding-top: calc(var(--nav-h) + var(--aviso-h, 2.2rem) + clamp(2rem, 6vw, 4.5rem)); }
+
+/* Sección de videos: tarjetas verticales iguales (el video se ve completo en el visor) */
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.8rem, 2.5vw, 1.4rem);
+}
+.video-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)) center / cover no-repeat;
+  box-shadow: 0 14px 34px rgba(44, 42, 34, 0.12);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+.video-card::after { width: 52px; height: 52px; background-size: 22px; }
+.video-card:hover { transform: translateY(-5px); box-shadow: 0 24px 44px rgba(44, 42, 34, 0.18); }
+.video-card:hover::after { transform: scale(1.08); }
+.video-titulo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2.4rem 0.85rem 0.8rem;
+  background: linear-gradient(transparent, rgba(20, 19, 15, 0.72));
+  color: var(--paper);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+}
+@media (max-width: 719px) {
+  .videos-grid > .video-card:only-child { grid-column: 1 / -1; justify-self: center; width: min(100%, 320px); }
+}
+@media (min-width: 720px) {
+  .videos-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 260px)); justify-content: center; }
+  .video-card::after { width: 62px; height: 62px; background-size: 26px; }
+  .video-titulo { padding: 2.4rem 1rem 0.9rem; font-size: 0.9rem; }
 }
 
 /* Visor de fotos en grande */
@@ -818,6 +916,17 @@ ul, ol { list-style: none; padding: 0; }
   background: rgba(20, 19, 15, 0.92);
 }
 .visor[hidden] { display: none; }
+.visor img[hidden], .visor iframe[hidden] { display: none; }
+.visor iframe {
+  width: min(960px, 100%);
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.visor iframe.vertical { width: auto; height: min(80vh, 760px); max-width: 100%; aspect-ratio: 9 / 16; }
+.visor iframe.instagram { aspect-ratio: auto; width: min(420px, 100%); height: min(82vh, 760px); background: #fff; }
 .visor img {
   max-width: min(1100px, 100%);
   max-height: 100%;

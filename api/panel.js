@@ -1,15 +1,15 @@
-// Panel de contenido de Olivé Spa (función de Vercel).
+// Panel de administración de Olivé Spa (función de Vercel).
 //
-// Valida el usuario y la contraseña del panel, lee index.html desde GitHub y
-// guarda precios, textos y fotos nuevos en un solo commit en `main`. Vercel
-// publica ese commit automáticamente, igual que cualquier otro push.
+// Todo el contenido editable vive en contenido.json. Al guardar desde /tarifas, esta función
+// valida el contenido, sube las fotos nuevas, genera index.html (api/_sitio.js) y publica
+// contenido.json + index.html + fotos en un solo commit en `main`. Vercel publica ese commit solo.
 //
-// Lo editable está marcado en index.html:
-//   data-tarifa="id"                 precio del servicio (solo el texto del precio)
-//   data-texto="id:campo"            nombre, descripcion o detalle (solo texto y <br>)
-//   data-foto="id"                   foto (img, y también link/meta que deban seguirla)
-//   data-galeria="id"                hasta 3 fotos del servicio (solo etiquetas <img> dentro;
-//                                    src = foto que se muestra, data-grande = foto para ampliar)
+// Acciones:
+//   POST ?accion=entrar   { usuario, clave }                         → cookie de sesión
+//   POST ?accion=salir                                                → borra la sesión
+//   GET                                                               → { contenido, esquema, camposServicio }
+//   POST ?accion=revisar  { version_base, contenido, nuevas: [...] }  → { cambios: [líneas] } (no publica)
+//   POST ?accion=guardar  { version_base, contenido, archivos: {...} }→ { version, contenido, cambios }
 //
 // Variables de entorno (Vercel → Settings → Environment Variables):
 //   PANEL_USUARIO  usuario del panel
@@ -18,36 +18,16 @@
 "use strict";
 
 const crypto = require("crypto");
+const sitio = require("./_sitio");
 
 const REPO = "spabienestar/brochure";
 const RAMA = "main";
-const ARCHIVO = "index.html";
-const SITIO = "https://olivespamedellin.com/";
 const CARPETA_FOTOS = "assets/img/panel/";
 const COOKIE = "olive_panel";
 const DURACION_SESION = 8 * 60 * 60; // segundos
-const PRECIO_MIN = 1000;
-const PRECIO_MAX = 50000000;
 const FOTO_MAX_BYTES = 3 * 1024 * 1024;
 const MINI_MAX_BYTES = 600 * 1024;
 const FOTOS_POR_GUARDADO = 8;
-const FOTOS_POR_GALERIA = 3;
-const CAMPOS = {
-  nombre: { max: 90, varias_lineas: false, obligatorio: true },
-  detalle: { max: 90, varias_lineas: false, obligatorio: false },
-  descripcion: { max: 700, varias_lineas: true, obligatorio: false }
-};
-
-// Elemento con data-tarifa="id" cuyo contenido es solo el precio, sin etiquetas dentro.
-const PATRON_TARIFA = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-tarifa="([a-z0-9-]+)"[^>]*>)([^<]*)(<\/\2>)/gi;
-// Elemento con data-texto="id:campo" cuyo contenido es texto con, a lo sumo, saltos <br>.
-const PATRON_TEXTO = /(<([a-z][a-z0-9]*)\b[^>]*?\sdata-texto="([a-z0-9-]+):(nombre|descripcion|detalle)"[^>]*>)((?:[^<]|<br\s*\/?>)*)(<\/\2>)/gi;
-// Etiqueta img/link/meta con data-foto="id".
-const PATRON_FOTO = /<(img|link|meta)\b[^>]*?\sdata-foto="([a-z0-9-]+)"[^>]*>/gi;
-// Contenedor data-galeria="id" cuyo contenido son solo etiquetas <img>.
-const PATRON_GALERIA = /(<div\b[^>]*?\sdata-galeria="([a-z0-9-]+)"[^>]*>)((?:<img\b[^>]*>)*)(<\/div>)/gi;
-// Ruta de una foto que ya está en el sitio.
-const PATRON_RUTA = /^assets\/img\/[a-z0-9._\/-]+\.jpg$/;
 
 function conEstado(estado, mensaje) {
   const error = new Error(mensaje);
@@ -143,246 +123,208 @@ async function github(cfg, metodo, ruta, cuerpo) {
   });
   const datos = await respuesta.json().catch(() => ({}));
   if (respuesta.ok) return datos;
-  // Al mover la rama, 422 significa que alguien más guardó antes (no es "fast forward").
-  if (respuesta.status === 409 || (respuesta.status === 422 && metodo === "PATCH")) {
-    throw conEstado(409, "Alguien guardó cambios al mismo tiempo. Recarga la página e intenta de nuevo.");
-  }
+  // Al mover la rama, 422 significa que entró otro commit antes (no es "fast forward").
+  if (respuesta.status === 409 || (respuesta.status === 422 && metodo === "PATCH")) throw conEstado(409, "rama-movida");
   if (respuesta.status === 401) throw conEstado(502, "El token de GitHub no es válido o ya venció.");
   if (respuesta.status === 403 || respuesta.status === 404) throw conEstado(502, "El token de GitHub no tiene permiso para editar el sitio.");
   throw conEstado(502, "GitHub respondió " + respuesta.status + ". Intenta de nuevo en un momento.");
 }
 
-async function leerIndex(cfg, referencia) {
-  const datos = await github(cfg, "GET", "/contents/" + ARCHIVO + "?ref=" + referencia);
-  return Buffer.from(datos.content, "base64").toString("utf8");
+async function leerContenido(cfg, referencia) {
+  const datos = await github(cfg, "GET", "/contents/contenido.json?ref=" + referencia);
+  return JSON.parse(Buffer.from(datos.content, "base64").toString("utf8"));
 }
 
-function formatear(precio) {
-  return "$" + String(precio).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
+/* ---------- Cambios en palabras (para la confirmación del panel y el mensaje del commit) ---------- */
+// Compara sin importar el orden de las claves (lo guardado y lo validado pueden venir en otro orden).
+const canonico = (v) => (Array.isArray(v) ? v.map(canonico) : v && typeof v === "object"
+  ? Object.keys(v).sort().reduce((o, k) => ((o[k] = canonico(v[k])), o), {}) : v);
+const igual = (a, b) => JSON.stringify(canonico(a)) === JSON.stringify(canonico(b));
+const formatoPrecio = (n) => "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-function aHtml(texto) {
-  return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "<br>");
-}
-
-function deHtml(html) {
-  return html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&");
-}
-
-function resumir(texto) {
-  const linea = texto.replace(/\s+/g, " ").trim();
-  return linea ? "«" + (linea.length > 60 ? linea.slice(0, 57) + "…" : linea) + "»" : "(vacío)";
-}
-
-function limpiarTexto(valor, campo) {
-  const reglas = CAMPOS[campo];
-  let texto = String(valor == null ? "" : valor).replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "");
-  if (reglas.varias_lineas) {
-    texto = texto.split("\n").map((linea) => linea.replace(/\s+/g, " ").trim()).join("\n").replace(/\n{3,}/g, "\n\n").trim();
-  } else {
-    texto = texto.replace(/\s+/g, " ").trim();
-  }
-  if (reglas.obligatorio && !texto) throw conEstado(400, "El nombre de un servicio no puede quedar vacío.");
-  if (texto.length > reglas.max) throw conEstado(400, "Un texto es demasiado largo (máximo " + reglas.max + " caracteres).");
-  return texto;
-}
-
-// Solo JPEG: el panel convierte y comprime todas las fotos antes de enviarlas.
-function jpegValido(base64, maximo) {
-  const bytes = Buffer.from(String(base64 || ""), "base64");
-  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) throw conEstado(400, "Una de las fotos no es una imagen válida.");
-  if (bytes.length > maximo) throw conEstado(400, "Una de las fotos es demasiado pesada.");
-  return bytes.toString("base64");
-}
-
-function validarPedido(cuerpo) {
-  const precios = Object.create(null);
-  const textos = Object.create(null);
-  const fotos = Object.create(null);
-  const galerias = Object.create(null);
-  const esObjeto = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
-
-  // `cambios` es el nombre que usaba la primera versión del panel para los precios.
-  const entradaPrecios = cuerpo.precios || cuerpo.cambios || {};
-  const entradaTextos = cuerpo.textos || {};
-  const entradaFotos = cuerpo.fotos || {};
-  const entradaGalerias = cuerpo.galerias || {};
-  if (!esObjeto(entradaPrecios) || !esObjeto(entradaTextos) || !esObjeto(entradaFotos) || !esObjeto(entradaGalerias)) {
-    throw conEstado(400, "Datos inválidos.");
-  }
-
-  for (const [id, valor] of Object.entries(entradaPrecios)) {
-    const precio = Number(valor);
-    if (!/^[a-z0-9-]+$/.test(id) || !Number.isInteger(precio) || precio < PRECIO_MIN || precio > PRECIO_MAX) {
-      throw conEstado(400, "Hay un precio no válido. Revisa los valores e intenta de nuevo.");
-    }
-    precios[id] = precio;
-  }
-  for (const [clave, valor] of Object.entries(entradaTextos)) {
-    const partes = /^([a-z0-9-]+):(nombre|descripcion|detalle)$/.exec(clave);
-    if (!partes) throw conEstado(400, "Hay un texto no válido.");
-    textos[clave] = limpiarTexto(valor, partes[2]);
-  }
-  let nuevas = 0;
-  for (const [id, foto] of Object.entries(entradaFotos)) {
-    if (!/^[a-z0-9-]+$/.test(id) || !esObjeto(foto) || typeof foto.datos !== "string") throw conEstado(400, "Hay una foto no válida.");
-    fotos[id] = { datos: jpegValido(foto.datos, FOTO_MAX_BYTES), alt: limpiarTexto(foto.alt, "detalle") };
-    nuevas++;
-  }
-  for (const [id, galeria] of Object.entries(entradaGalerias)) {
-    if (!/^[a-z0-9-]+$/.test(id) || !esObjeto(galeria) || !Array.isArray(galeria.fotos)) throw conEstado(400, "Hay una galería no válida.");
-    if (galeria.fotos.length > FOTOS_POR_GALERIA) throw conEstado(400, "Cada servicio puede tener máximo " + FOTOS_POR_GALERIA + " fotos.");
-    const lista = galeria.fotos.map((foto) => {
-      if (!esObjeto(foto)) throw conEstado(400, "Hay una foto no válida.");
-      // Una foto que ya está en la galería se envía por su ruta; una nueva, con sus datos.
-      if (typeof foto.grande === "string") {
-        if (!PATRON_RUTA.test(foto.grande)) throw conEstado(400, "Hay una foto no válida.");
-        return { grande: foto.grande };
-      }
-      nuevas++;
-      return { datos: jpegValido(foto.datos, FOTO_MAX_BYTES), mini: foto.mini ? jpegValido(foto.mini, MINI_MAX_BYTES) : null };
-    });
-    const rutas = lista.filter((f) => f.grande).map((f) => f.grande);
-    if (new Set(rutas).size !== rutas.length) throw conEstado(400, "Una foto aparece repetida en la misma galería.");
-    galerias[id] = { alt: limpiarTexto(galeria.alt, "detalle") || "Olivé Spa", fotos: lista };
-  }
-  if (nuevas > FOTOS_POR_GUARDADO) throw conEstado(400, "Son muchas fotos a la vez. Guarda máximo " + FOTOS_POR_GUARDADO + ".");
-  if (![precios, textos, fotos, galerias].some((grupo) => Object.keys(grupo).length)) throw conEstado(400, "No hay cambios para guardar.");
-  return { precios, textos, fotos, galerias };
-}
-
-// Aplica el pedido sobre el HTML. Devuelve el HTML nuevo y una línea por cambio real.
-function aplicar(html, pedido, rutasFotos) {
-  const vistos = new Set();
+function resumirCambios(antes, despues) {
   const lineas = [];
-
-  let nuevo = html.replace(PATRON_TARIFA, (todo, abre, _etiqueta, id, texto, cierra) => {
-    if (!(id in pedido.precios)) return todo;
-    vistos.add("precio:" + id);
-    const precio = formatear(pedido.precios[id]);
-    if (texto.trim() === precio) return todo;
-    lineas.push("- precio " + id + ": " + texto.trim() + " → " + precio);
-    return abre + precio + cierra;
-  });
-
-  nuevo = nuevo.replace(PATRON_TEXTO, (todo, abre, _etiqueta, id, campo, contenido, cierra) => {
-    const clave = id + ":" + campo;
-    if (!(clave in pedido.textos)) return todo;
-    vistos.add("texto:" + clave);
-    const texto = pedido.textos[clave];
-    const anterior = deHtml(contenido).trim();
-    if (anterior === texto) return todo;
-    lineas.push("- " + campo + " " + id + ": " + resumir(anterior) + " → " + resumir(texto));
-    return abre + aHtml(texto) + cierra;
-  });
-
-  nuevo = nuevo.replace(PATRON_FOTO, (etiqueta, tipo, id) => {
-    if (!(id in rutasFotos)) return etiqueta;
-    const ruta = rutasFotos[id];
-    tipo = tipo.toLowerCase();
-    if (tipo === "link") return etiqueta.replace(/\shref="[^"]*"/i, ' href="' + ruta + '"');
-    if (tipo === "meta") return etiqueta.replace(/\scontent="[^"]*"/i, ' content="' + SITIO + ruta + '"');
-    vistos.add("foto:" + id);
-    // El recorte (object-position) era para la foto anterior; el texto alternativo describe la nueva.
-    let nueva = etiqueta.replace(/\ssrc="[^"]*"/i, ' src="' + ruta + '"').replace(/\sstyle="[^"]*"/i, "");
-    const alt = pedido.fotos[id].alt;
-    if (alt && /\salt="[^"]+"/i.test(nueva)) nueva = nueva.replace(/\salt="[^"]*"/i, ' alt="' + aHtml(alt) + '"');
-    return nueva;
-  });
-  for (const id of Object.keys(rutasFotos)) lineas.push("- foto " + id + ": " + rutasFotos[id]);
-
-  const galerias = Object.create(null); // id -> fotos finales [{ grande, src }]
-  nuevo = nuevo.replace(PATRON_GALERIA, (todo, abre, id, contenido, cierra) => {
-    if (!(id in pedido.galerias)) return todo;
-    vistos.add("galeria:" + id);
-    // En las miniaturas (masajes, faciales) se muestra la versión pequeña; en las portadas, la grande.
-    const esMini = /\bgaleria-mini\b/.test(abre);
-    const actuales = new Map(); // foto grande -> foto que se muestra
-    for (const [etiqueta] of contenido.matchAll(/<img\b[^>]*>/gi)) {
-      const src = (/\ssrc="([^"]*)"/i.exec(etiqueta) || [])[1];
-      const grande = (/\sdata-grande="([^"]*)"/i.exec(etiqueta) || [])[1] || src;
-      if (grande) actuales.set(grande, src || grande);
-    }
-    const galeria = pedido.galerias[id];
-    const finales = galeria.fotos.map((foto) => {
-      if (foto.grande) {
-        if (!actuales.has(foto.grande)) throw conEstado(409, "Las fotos cambiaron mientras editabas. Recarga la página e intenta de nuevo.");
-        return { grande: foto.grande, src: actuales.get(foto.grande) };
+  for (const seccion of sitio.ESQUEMA) {
+    const a = antes[seccion.clave] || {};
+    const d = despues[seccion.clave] || {};
+    const campos = [];
+    for (const def of seccion.campos) {
+      if (def.tipo === "servicios") {
+        const viejos = new Map((a.servicios || []).map((s) => [s.id, s]));
+        const nuevos = new Map(d.servicios.map((s) => [s.id, s]));
+        for (const s of d.servicios) {
+          const v = viejos.get(s.id);
+          if (!v) { lineas.push(seccion.titulo + ": servicio nuevo «" + s.nombre + "»"); continue; }
+          if (v.precio !== s.precio && s.precio !== undefined) lineas.push(seccion.titulo + ": precio de «" + s.nombre + "» " + formatoPrecio(v.precio) + " → " + formatoPrecio(s.precio));
+          const otros = [];
+          for (const k of Object.keys(sitio.CAMPOS_SERVICIO)) {
+            if (k === "precio" || !(k in s)) continue;
+            const anterior = k === "medios" ? (v.medios || []).map((m) => m.grande || m.url) : v[k];
+            const actual = k === "medios" ? s.medios.map((m) => m.grande || m.nueva || m.url) : s[k];
+            if (!igual(anterior, actual)) otros.push(k === "medios" ? "fotos/videos" : sitio.CAMPOS_SERVICIO[k].etiqueta.split(" (")[0].toLowerCase());
+          }
+          if (otros.length) lineas.push(seccion.titulo + ": «" + s.nombre + "» (" + otros.join(", ") + ")");
+        }
+        for (const v of a.servicios || []) if (!nuevos.has(v.id)) lineas.push(seccion.titulo + ": se elimina «" + v.nombre + "»");
+        const ordenAntes = (a.servicios || []).map((s) => s.id).filter((id) => nuevos.has(id));
+        const ordenDespues = d.servicios.map((s) => s.id).filter((id) => viejos.has(id));
+        if (!igual(ordenAntes, ordenDespues)) lineas.push(seccion.titulo + ": nuevo orden de los servicios");
+      } else if (def.tipo === "videos") {
+        const urlsAntes = (a[def.k] || []).map((v) => v.url);
+        const urlsDespues = d[def.k].map((v) => v.url);
+        const n = d[def.k].length;
+        if (!igual(urlsAntes, urlsDespues)) lineas.push(seccion.titulo + ": " + (n ? "quedan " + n + (n === 1 ? " video" : " videos") : "se quitan todos los videos"));
+        else if (!igual(a[def.k], d[def.k])) campos.push("títulos de los videos");
+      } else if (!igual(a[def.k], d[def.k])) {
+        campos.push(def.tipo === "interruptor" ? (d[def.k] ? "se muestra" : "se oculta") : def.etiqueta.split(" (")[0].toLowerCase());
       }
-      return { grande: foto.nueva.grande, src: esMini && foto.nueva.mini ? foto.nueva.mini : foto.nueva.grande };
-    });
-    const alt = aHtml(galeria.alt);
-    const contenidoNuevo = finales.map((f) => '<img src="' + f.src + '" data-grande="' + f.grande + '" alt="' + alt + '" loading="lazy" decoding="async" />').join("");
-    const abreNuevo = abre.replace(/\sdata-cantidad="\d*"/i, ' data-cantidad="' + finales.length + '"');
-    galerias[id] = finales;
-    if (contenidoNuevo === contenido && abreNuevo === abre) return todo;
-    const nuevasAqui = galeria.fotos.filter((f) => !f.grande).length;
-    const mismasFotos = [...actuales.keys()].join("|") === finales.map((f) => f.grande).join("|");
-    lineas.push("- fotos " + id + ": " + (mismasFotos ? "texto alternativo" : finales.length + " foto(s)" + (nuevasAqui ? ", " + nuevasAqui + " nueva(s)" : "")));
-    return abreNuevo + contenidoNuevo + cierra;
-  });
-
-  const faltan = [
-    ...Object.keys(pedido.precios).filter((id) => !vistos.has("precio:" + id)),
-    ...Object.keys(pedido.textos).filter((clave) => !vistos.has("texto:" + clave)),
-    ...Object.keys(rutasFotos).filter((id) => !vistos.has("foto:" + id)),
-    ...Object.keys(pedido.galerias).filter((id) => !vistos.has("galeria:" + id))
-  ];
-  if (faltan.length) throw conEstado(400, "No se encontraron estos elementos en la página: " + faltan.join(", "));
-  return { html: nuevo, lineas, galerias };
+    }
+    if (campos.length) lineas.push(seccion.titulo + ": " + campos.join(", "));
+  }
+  return lineas;
 }
 
-// Guarda todo en un solo commit con la API de datos de Git (blobs → árbol → commit → rama).
-async function publicar(cfg, pedido) {
-  const sello = new Date().toISOString().replace(/\D/g, "").slice(0, 14) + "-" + crypto.randomBytes(2).toString("hex");
-  const archivosFotos = [];
-  const subir = async (ruta, datos) => {
-    const blob = await github(cfg, "POST", "/git/blobs", { content: datos, encoding: "base64" });
-    archivosFotos.push({ path: ruta, mode: "100644", type: "blob", sha: blob.sha });
-    return ruta;
+/* ---------- Guardado ---------- */
+// Los enlaces cortos de TikTok y Facebook (vm.tiktok.com, fb.watch, …) se convierten al enlace completo del video.
+const ENLACE_CORTO = /^https?:\/\/((vm|vt)\.tiktok\.com\/|(www\.|m\.)?tiktok\.com\/t\/|fb\.watch\/|(www\.|m\.)?facebook\.com\/share\/[vr]\/)/i;
+async function resolverEnlacesCortos(contenido) {
+  const cortos = [];
+  const visitar = (v) => {
+    if (Array.isArray(v)) v.forEach(visitar);
+    else if (v && typeof v === "object") {
+      if (typeof v.url === "string" && ENLACE_CORTO.test(v.url.trim())) cortos.push(v);
+      Object.values(v).forEach(visitar);
+    }
   };
-  const rutasFotos = Object.create(null);
-  for (const [id, foto] of Object.entries(pedido.fotos)) {
-    rutasFotos[id] = await subir(CARPETA_FOTOS + id + "-" + sello + ".jpg", foto.datos);
-  }
-  for (const [id, galeria] of Object.entries(pedido.galerias)) {
-    let n = 0;
-    for (const foto of galeria.fotos) {
-      if (foto.grande) continue;
-      const base = CARPETA_FOTOS + id + "-" + sello + "-" + ++n;
-      foto.nueva = {
-        grande: await subir(base + ".jpg", foto.datos),
-        mini: foto.mini ? await subir(base + "-mini.jpg", foto.mini) : null
-      };
+  visitar(contenido);
+  for (const video of cortos.slice(0, 6)) {
+    try {
+      const r = await fetch(video.url.trim(), { redirect: "follow", headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(8000) });
+      if (r.url) video.url = r.url;
+    } catch (_) {
+      // Si no se puede resolver, la validación avisará que el enlace no se reconoce.
     }
   }
+}
+
+function validarArchivos(archivos) {
+  if (!archivos || typeof archivos !== "object" || Array.isArray(archivos)) throw conEstado(400, "Datos inválidos.");
+  const claves = Object.keys(archivos);
+  if (claves.length > FOTOS_POR_GUARDADO) throw conEstado(400, "Son muchas fotos a la vez. Guarda máximo " + FOTOS_POR_GUARDADO + ".");
+  const limpios = Object.create(null);
+  const jpeg = (base64, maximo) => {
+    const bytes = Buffer.from(String(base64 || ""), "base64");
+    if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) throw conEstado(400, "Una de las fotos no es una imagen válida.");
+    if (bytes.length > maximo) throw conEstado(400, "Una de las fotos es demasiado pesada.");
+    return bytes.toString("base64");
+  };
+  for (const clave of claves) {
+    if (!/^[a-z0-9-]{1,40}$/.test(clave)) throw conEstado(400, "Datos inválidos.");
+    const a = archivos[clave] || {};
+    limpios[clave] = { datos: jpeg(a.datos, FOTO_MAX_BYTES), mini: a.mini ? jpeg(a.mini, MINI_MAX_BYTES) : null };
+  }
+  return limpios;
+}
+
+// Reemplaza cada { nueva: "clave" } por las rutas de la foto ya subida.
+function ponerRutas(valor, rutas) {
+  if (Array.isArray(valor)) return valor.map((v) => ponerRutas(v, rutas));
+  if (valor && typeof valor === "object") {
+    if (valor.nueva) {
+      const r = rutas[valor.nueva];
+      const { nueva, ...resto } = valor;
+      return { ...resto, grande: r.grande, ...(r.mini ? { mini: r.mini } : {}) };
+    }
+    const salida = {};
+    for (const [k, v] of Object.entries(valor)) salida[k] = ponerRutas(v, rutas);
+    return salida;
+  }
+  return valor;
+}
+
+function clavesNuevas(valor, encontradas) {
+  if (Array.isArray(valor)) valor.forEach((v) => clavesNuevas(v, encontradas));
+  else if (valor && typeof valor === "object") {
+    if (valor.nueva) encontradas.add(valor.nueva);
+    Object.values(valor).forEach((v) => clavesNuevas(v, encontradas));
+  }
+  return encontradas;
+}
+
+async function prepararGuardado(cfg, cuerpo, nuevas) {
+  if (!cuerpo || typeof cuerpo !== "object" || !cuerpo.contenido) {
+    throw conEstado(400, "El panel se actualizó. Recarga la página para usar la versión nueva.");
+  }
+  const cabeza = (await github(cfg, "GET", "/git/ref/heads/" + RAMA)).object.sha;
+  let actual = await leerContenido(cfg, cabeza);
+  // Lo guardado pasa por la misma limpieza, para que el resumen muestre solo lo que de verdad cambió.
+  try {
+    actual = sitio.validar(actual, { rutasPermitidas: sitio.rutasDeFotos(actual), fotosNuevas: new Set() });
+  } catch (_) {
+    // Si alguien editó contenido.json a mano y quedó inválido, se compara tal cual.
+  }
+  if (Number(cuerpo.version_base) !== actual.version) {
+    throw conEstado(409, "Alguien guardó cambios hace un momento. Recarga la página para ver la última versión.");
+  }
+  await resolverEnlacesCortos(cuerpo.contenido);
+  const limpio = sitio.validar(cuerpo.contenido, { rutasPermitidas: sitio.rutasDeFotos(actual), fotosNuevas: nuevas });
+  return { cabeza, actual, limpio };
+}
+
+async function publicar(cfg, cuerpo) {
+  const archivos = validarArchivos(cuerpo.archivos || {});
+  let { cabeza, actual, limpio } = await prepararGuardado(cfg, cuerpo, new Set(Object.keys(archivos)));
+
+  // Subir solo las fotos que el contenido usa de verdad.
+  const sello = new Date().toISOString().replace(/\D/g, "").slice(0, 14) + "-" + crypto.randomBytes(2).toString("hex");
+  const arbolFotos = [];
+  const rutas = Object.create(null);
+  let n = 0;
+  for (const clave of clavesNuevas(limpio, new Set())) {
+    const base = CARPETA_FOTOS + "foto-" + sello + "-" + ++n;
+    const subir = async (ruta, datos) => {
+      const blob = await github(cfg, "POST", "/git/blobs", { content: datos, encoding: "base64" });
+      arbolFotos.push({ path: ruta, mode: "100644", type: "blob", sha: blob.sha });
+      return ruta;
+    };
+    rutas[clave] = {
+      grande: await subir(base + ".jpg", archivos[clave].datos),
+      mini: archivos[clave].mini ? await subir(base + "-mini.jpg", archivos[clave].mini) : null
+    };
+  }
+  limpio = ponerRutas(limpio, rutas);
+
+  const lineas = resumirCambios(actual, limpio);
+  if (!lineas.length) return { cambios: 0, version: actual.version, contenido: actual, fotos: {} };
+  limpio.version = actual.version + 1;
+  const html = sitio.renderizar(limpio);
 
   for (let intento = 1; ; intento++) {
-    const rama = await github(cfg, "GET", "/git/ref/heads/" + RAMA);
-    const cabeza = rama.object.sha;
     const commitActual = await github(cfg, "GET", "/git/commits/" + cabeza);
-    const { html, lineas, galerias } = aplicar(await leerIndex(cfg, cabeza), pedido, rutasFotos);
-    if (!lineas.length) return { cambios: 0, fotos: {}, galerias: {} };
-
     const arbol = await github(cfg, "POST", "/git/trees", {
       base_tree: commitActual.tree.sha,
-      tree: [{ path: ARCHIVO, mode: "100644", type: "blob", content: html }, ...archivosFotos]
+      tree: [
+        { path: "contenido.json", mode: "100644", type: "blob", content: JSON.stringify(limpio, null, 2) + "\n" },
+        { path: "index.html", mode: "100644", type: "blob", content: html },
+        ...arbolFotos
+      ]
     });
     const commit = await github(cfg, "POST", "/git/commits", {
-      message: "Contenido actualizado desde el panel (" + lineas.length + ")\n\n" + lineas.join("\n"),
+      message: "Contenido actualizado desde el panel (" + lineas.length + ")\n\n" + lineas.map((l) => "- " + l).join("\n"),
       tree: arbol.sha,
       parents: [cabeza]
     });
     try {
       await github(cfg, "PATCH", "/git/refs/heads/" + RAMA, { sha: commit.sha, force: false });
-      return { cambios: lineas.length, fotos: rutasFotos, galerias };
+      // `fotos` dice dónde quedó cada foto nueva, para que el panel siga mostrándola mientras Vercel publica.
+      return { cambios: lineas.length, version: limpio.version, contenido: limpio, fotos: rutas };
     } catch (error) {
-      // Otro cambio entró justo antes: se rehace sobre la versión nueva (las fotos ya subidas se reutilizan).
-      if (error.estado === 409 && intento < 3) continue;
-      throw error;
+      if (error.estado !== 409 || intento >= 3) throw error;
+      // Entró otro commit (por ejemplo, un cambio de diseño): si el contenido no cambió, se reintenta encima.
+      cabeza = (await github(cfg, "GET", "/git/ref/heads/" + RAMA)).object.sha;
+      if ((await leerContenido(cfg, cabeza)).version !== actual.version) {
+        throw conEstado(409, "Alguien guardó cambios hace un momento. Recarga la página para ver la última versión.");
+      }
     }
   }
 }
@@ -430,17 +372,24 @@ module.exports = async function panel(req, res) {
     if (!sesionValida(cfg, leerCookie(req))) return responder(401, { error: "Tu sesión terminó. Vuelve a entrar." });
 
     if (req.method === "GET") {
-      return responder(200, { html: await leerIndex(cfg, RAMA) });
+      return responder(200, { contenido: await leerContenido(cfg, RAMA), esquema: sitio.ESQUEMA, camposServicio: sitio.CAMPOS_SERVICIO });
+    }
+
+    if (req.method === "POST" && accion === "revisar") {
+      const cuerpo = await leerCuerpo(req);
+      const nuevas = new Set(Array.isArray(cuerpo.nuevas) ? cuerpo.nuevas.map(String) : []);
+      const { actual, limpio } = await prepararGuardado(cfg, cuerpo, nuevas);
+      return responder(200, { ok: true, cambios: resumirCambios(actual, limpio) });
     }
 
     if (req.method === "POST" && accion === "guardar") {
-      const resultado = await publicar(cfg, validarPedido(await leerCuerpo(req)));
-      return responder(200, { ok: true, ...resultado });
+      return responder(200, { ok: true, ...(await publicar(cfg, await leerCuerpo(req))) });
     }
 
     return responder(405, { error: "Acción no válida." });
   } catch (error) {
     if (!error.estado) console.error("[panel]", error);
-    return responder(error.estado || 500, { error: error.estado ? error.message : "Ocurrió un error inesperado. Intenta de nuevo." });
+    const mensaje = error.estado ? (error.message === "rama-movida" ? "Alguien guardó cambios al mismo tiempo. Intenta de nuevo." : error.message) : "Ocurrió un error inesperado. Intenta de nuevo.";
+    return responder(error.estado || 500, { error: mensaje });
   }
 };

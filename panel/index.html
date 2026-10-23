@@ -24,6 +24,7 @@
       --error: #a8412f;
       --serif: "Cormorant Garamond", Georgia, serif;
       --sans: "Montserrat", "Segoe UI", sans-serif;
+      --pad: 1.1rem;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; }
     body {
@@ -35,10 +36,12 @@
       -webkit-font-smoothing: antialiased;
     }
     button { font: inherit; cursor: pointer; }
+    button:disabled { cursor: default; }
+    input, textarea { font: inherit; color: inherit; }
     [hidden] { display: none !important; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .shell { width: min(640px, 100%); margin-inline: auto; padding: 1.5rem 1rem 10rem; }
+    .shell { width: min(680px, 100%); margin-inline: auto; padding: 1.5rem 1rem 11rem; }
     .brand { text-align: center; margin-bottom: 1.5rem; }
     .brand-name { font-family: var(--serif); font-weight: 600; font-size: 2.2rem; line-height: 1; }
     .brand-tag {
@@ -56,25 +59,14 @@
       padding: 1.5rem 1.25rem;
       box-shadow: 0 10px 30px -18px rgba(44, 42, 34, 0.35);
     }
-    .cargando, .aviso { text-align: center; color: var(--ink-soft); }
+    .cargando, .mensaje-carga { text-align: center; color: var(--ink-soft); }
 
     /* ---------- Entrar ---------- */
     .login { max-width: 400px; margin-inline: auto; display: grid; gap: 1rem; }
     .login h1 { font-family: var(--serif); font-weight: 600; font-size: 1.7rem; }
-    .campo { display: grid; gap: 0.35rem; font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); }
-    .campo input, .campo textarea, .clave {
-      width: 100%;
-      font: 400 1rem var(--sans);
-      color: var(--ink);
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 0.75rem 0.9rem;
-    }
-    .campo textarea { resize: none; overflow: hidden; min-height: 5.5rem; line-height: 1.45; }
-    .campo input:focus, .campo textarea:focus, .clave:focus-within { border-color: var(--accent); outline: none; }
+    .login .campo { font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); }
     .clave { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.4rem 0 0; }
-    .clave input { flex: 1; border: 0; background: transparent; padding: 0.8rem 0.9rem; font: inherit; min-width: 0; }
+    .clave input { flex: 1; border: 0 !important; background: transparent !important; padding: 0.8rem 0.9rem !important; min-width: 0; }
     .clave input:focus-visible { outline: none; }
     .ver-clave { border: 0; background: none; color: var(--accent); font-size: 0.8rem; font-weight: 600; padding: 0.5rem; }
     .error { color: var(--error); font-size: 0.85rem; min-height: 1.3em; }
@@ -90,31 +82,299 @@
       transition: opacity 0.2s, transform 0.2s;
     }
     .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+    .btn:disabled { opacity: 0.45; transform: none; }
     .btn-sec { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-    .link { border: 0; background: none; color: var(--accent); font-weight: 600; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+    .link { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+    .mini-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 0.42rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .mini-btn.peligro { color: var(--error); }
+    .mini-btn.agregar { justify-self: start; border: 1.5px dashed var(--accent); background: rgba(111, 107, 63, 0.04); padding: 0.55rem 1rem; }
+    .mini-btn:disabled { opacity: 0.45; }
+
+    /* ---------- Campos ---------- */
+    .campo { display: grid; gap: 0.35rem; }
+    .campo-etiqueta { font-size: 0.82rem; font-weight: 500; color: var(--ink-soft); }
+    .campo input[type="text"], .campo input[type="email"], .campo input[type="url"], .campo input[type="tel"],
+    .campo input:not([type]), .campo textarea, .clave, .telefono {
+      width: 100%;
+      font-size: 1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.7rem 0.85rem;
+    }
+    .campo textarea { resize: none; overflow: hidden; min-height: 5.2rem; line-height: 1.45; }
+    .campo textarea.una-linea { min-height: 0; }
+    .campo input:focus, .campo textarea:focus, .clave:focus-within, .telefono:focus-within { border-color: var(--accent); outline: none; }
+    .campo-error { font-size: 0.78rem; color: var(--error); font-weight: 500; }
+    .campo-error:empty { display: none; }
+    .campo-nota { font-size: 0.74rem; color: var(--ink-mute); }
+    .campo-nota:empty { display: none; }
+    .campo.modificado > .campo-etiqueta, .campo.modificado > label { color: #8a6a2f; }
+    .campo.modificado > input, .campo.modificado > textarea, .campo.modificado > .telefono { border-color: var(--accent-2); }
+    .campo.invalido input, .campo.invalido textarea, .campo.invalido .telefono { border-color: var(--error); }
+    .telefono { display: flex; align-items: center; gap: 0.5rem; padding-block: 0; }
+    .telefono-prefijo { color: var(--ink-mute); font-weight: 500; }
+    .telefono input { flex: 1; min-width: 0; border: 0 !important; padding: 0.7rem 0 !important; background: transparent; }
+    .telefono input:focus-visible { outline: none; }
+
+    .interruptor {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 0.9rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .interruptor.modificado { border-color: var(--accent-2); }
+    .interruptor input {
+      appearance: none;
+      -webkit-appearance: none;
+      flex-shrink: 0;
+      position: relative;
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      background: #cfcab8;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .interruptor input::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s;
+    }
+    .interruptor input:checked { background: var(--accent); }
+    .interruptor input:checked::after { transform: translateX(20px); }
+
+    .casilla { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.82rem; color: var(--ink-soft); cursor: pointer; }
+    .casilla input { width: 1.1rem; height: 1.1rem; margin-top: 0.12rem; accent-color: var(--accent); flex-shrink: 0; }
+
+    .bloque { display: grid; gap: 0.6rem; padding: 0.85rem; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+    .bloque-num { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+    .bloque-acciones { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .mini-campo { display: grid; gap: 0.25rem; font-size: 0.76rem; font-weight: 500; color: var(--ink-mute); }
+    .mini-campo input, .mini-campo textarea {
+      width: 100%;
+      font-size: 1rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.55rem 0.75rem;
+      color: var(--ink);
+    }
+    .mini-campo textarea { resize: none; overflow: hidden; min-height: 4.2rem; line-height: 1.45; }
+    .mini-campo input:focus, .mini-campo textarea:focus { border-color: var(--accent); outline: none; }
+    .mini-campo input:disabled { background: #f1ede3; color: var(--ink-mute); }
+    .campo.modificado .bloque { border-color: rgba(185, 146, 79, 0.6); }
+    .lista { display: grid; gap: 0.45rem; }
+    .lista-fila { display: flex; gap: 0.45rem; align-items: center; }
+    .lista-fila input { flex: 1; min-width: 0; }
+
+    /* Fotos */
+    .foto-campo { display: flex; gap: 0.9rem; align-items: center; }
+    .miniatura {
+      width: 120px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      background: var(--sage);
+      border: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .campo.modificado .miniatura { border: 2px solid var(--accent-2); }
+    .foto-acciones { display: grid; gap: 0.45rem; justify-items: start; }
+    .btn-foto { display: inline-block; padding: 0.55rem 1rem; font-size: 0.82rem; cursor: pointer; }
+    .medios { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; align-items: start; }
+    .medio { position: relative; display: grid; gap: 0.3rem; margin: 0; }
+    .medio img, .medio .video-mini { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; background: var(--sage); border: 1px solid var(--line); }
+    .medio.nuevo img { border: 2px solid var(--accent-2); }
+    .medio-principal {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(44, 42, 34, 0.75);
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 600;
+    }
+    .medio-quitar {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(44, 42, 34, 0.78);
+      color: #fff;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .medio-hacer-principal { justify-self: start; border: 0; background: none; padding: 0.1rem 0; color: var(--accent); font-size: 0.74rem; font-weight: 600; text-align: left; }
+    .medios .vacio { grid-column: 1 / -1; }
+    .medios-agregar { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .medios-agregar label { cursor: pointer; }
+    .medios-agregar input { display: none; }
+
+    /* Videos */
+    .video-mini {
+      position: relative;
+      display: grid;
+      place-items: center;
+      aspect-ratio: 16 / 10;
+      border-radius: 10px;
+      background: linear-gradient(140deg, #6f6b3f, #b9924f) center / cover no-repeat;
+      color: #fff;
+      overflow: hidden;
+    }
+    .video-mini::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236f6b3f' d='M8 5v14l11-7z'/%3E%3C/svg%3E") 55% 50% / 14px no-repeat;
+    }
+    .video-mini.youtube { background-size: auto 134%; } /* recorta las franjas negras de la portada */
+    .video-mini-nombre { position: absolute; left: 6px; bottom: 5px; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em; }
+    .video-item { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 0.8rem; align-items: start; padding: 0.75rem; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+    .video-datos { display: grid; gap: 0.45rem; min-width: 0; }
+    .video-plataforma { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); overflow-wrap: anywhere; }
+    .video-plataforma a { color: inherit; }
+    .video-datos input {
+      width: 100%;
+      font-size: 1rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.5rem 0.7rem;
+    }
+    .video-form { display: grid; gap: 0.4rem; padding: 0.85rem; border: 1.5px dashed var(--accent); border-radius: 14px; background: rgba(111, 107, 63, 0.04); }
+    .video-form-fila { display: flex; gap: 0.5rem; }
+    .video-form-fila input { flex: 1; min-width: 0; font-size: 1rem; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 0.6rem 0.8rem; }
+    .video-form .btn { padding: 0.6rem 1rem; font-size: 0.85rem; flex-shrink: 0; }
+    .video-form .link { justify-self: start; font-size: 0.78rem; }
+    .vacio { font-size: 0.85rem; color: var(--ink-mute); }
 
     /* ---------- Editor ---------- */
-    .intro { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; }
+    .intro { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
     .intro p { font-size: 0.9rem; color: var(--ink-soft); }
     .intro-acciones { display: grid; gap: 0.4rem; justify-items: end; flex-shrink: 0; }
     .intro-acciones a { color: var(--accent); font-weight: 600; font-size: 0.85rem; }
-    .grupo { margin-bottom: 1.25rem; padding: 0; overflow: hidden; }
-    .grupo h2 {
-      padding: 0.9rem 1rem;
-      background: var(--sage);
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
+    .ayuda { margin-bottom: 1rem; background: var(--sage); border-radius: 16px; padding: 0.2rem 1rem; }
+    .ayuda summary { cursor: pointer; padding: 0.7rem 0; font-weight: 600; font-size: 0.88rem; color: var(--accent); }
+    .ayuda-cuerpo { display: grid; gap: 0.6rem; padding-bottom: 1rem; font-size: 0.86rem; color: var(--ink-soft); }
+    .ayuda-cuerpo ol, .ayuda-cuerpo ul { padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+
+    .seccion {
+      margin-bottom: 0.75rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px -22px rgba(44, 42, 34, 0.4);
     }
-    .fila { padding: 0.85rem 1rem; border-top: 1px solid var(--line); transition: background 0.2s; }
-    .grupo h2 + .fila { border-top: 0; }
-    .fila-principal { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 0.9rem; align-items: center; }
-    .fila-texto { display: grid; gap: 0.1rem; min-width: 0; }
-    .fila-nombre { font-weight: 500; font-size: 0.92rem; }
-    .fila-detalle { font-size: 0.74rem; color: var(--ink-mute); }
+    .seccion > summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.55rem;
+      padding: 0.95rem 2.6rem 0.95rem var(--pad);
+      position: relative;
+      list-style: none;
+      cursor: pointer;
+    }
+    .seccion > summary::-webkit-details-marker { display: none; }
+    .seccion > summary::after {
+      content: "";
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      width: 0.5rem;
+      height: 0.5rem;
+      margin-top: -0.35rem;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+    .seccion[open] > summary::after { transform: rotate(-135deg); margin-top: -0.1rem; }
+    .sec-titulo { font-family: var(--serif); font-weight: 600; font-size: 1.3rem; line-height: 1.2; }
+    .sec-info { font-size: 0.74rem; color: var(--ink-mute); }
+    .sec-marcas { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .pastilla { font-size: 0.66rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+    .pastilla-gris { background: #ece7da; color: var(--ink-mute); }
+    .pastilla-activa { background: var(--sage); color: var(--accent); }
+    .pastilla-cambios { background: rgba(185, 146, 79, 0.2); color: #7d5f27; }
+    .pastilla-error { background: rgba(168, 65, 47, 0.12); color: var(--error); }
+    .sec-cuerpo { display: grid; gap: 1.1rem; padding: 0.2rem var(--pad) 1.3rem; }
+    .sec-ayuda { font-size: 0.82rem; color: var(--ink-soft); background: rgba(221, 229, 207, 0.55); border-radius: 12px; padding: 0.7rem 0.9rem; }
+    .sub { border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
+    .sub > summary { cursor: pointer; padding: 0.75rem 0.9rem; font-weight: 600; font-size: 0.85rem; color: var(--accent); }
+    .sub-cuerpo { display: grid; gap: 1rem; padding: 0.2rem 0.9rem 1rem; }
+    .deshacer-seccion { justify-self: start; font-size: 0.8rem; }
+    .vista-aviso { padding: 0.55rem 0.9rem; border-radius: 10px; background: var(--accent); color: #fff; font-size: 0.82rem; text-align: center; }
+    .google { display: grid; gap: 0.15rem; padding: 0.9rem; background: #fff; border: 1px solid var(--line); border-radius: 14px; font-family: Arial, sans-serif; }
+    .google-url { font-size: 0.78rem; color: #4d5156; }
+    .google-titulo { font-size: 1.1rem; color: #1a0dab; line-height: 1.3; }
+    .google-desc { font-size: 0.84rem; color: #4d5156; }
+    .google-nota { font-family: var(--sans); font-size: 0.7rem; color: var(--ink-mute); margin-bottom: 0.3rem; }
+
+    /* Servicios */
+    .servicios { display: grid; }
+    .servicio { margin: 0 calc(var(--pad) * -1); padding: 0.8rem var(--pad); border-top: 1px solid var(--line); transition: background 0.2s; }
+    .servicio.cambiado { background: rgba(185, 146, 79, 0.1); }
+    .servicio.invalido { background: rgba(168, 65, 47, 0.06); }
+    .servicio-fila { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 0.75rem; align-items: center; }
+    .servicio-foto {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--sage) center / cover no-repeat;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    .servicio-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .servicio-texto { display: grid; gap: 0.05rem; min-width: 0; padding: 0; border: 0; background: none; text-align: left; color: inherit; }
+    .servicio-titulo { font-weight: 500; font-size: 0.92rem; overflow-wrap: anywhere; }
+    .servicio-sub { font-size: 0.72rem; color: var(--ink-mute); }
+    .servicio-sub:empty { display: none; }
+    .servicio-editar { font-size: 0.76rem; font-weight: 600; color: var(--accent); }
+    .servicio-aviso { margin: 0.35rem 0 0 calc(48px + 0.75rem); font-size: 0.74rem; color: var(--accent-2); font-weight: 500; }
+    .servicio-aviso:empty { display: none; }
+    .servicio-aviso.malo { color: var(--error); }
     .precio {
       display: flex;
       align-items: baseline;
@@ -129,89 +389,20 @@
       cursor: text;
     }
     .precio:focus-within { border-color: var(--accent); }
+    .precio.modificado { border-color: var(--accent-2); }
+    .precio.invalido { border-color: var(--error); }
     .precio input { width: 7.6ch; border: 0; background: transparent; font: inherit; color: var(--ink); text-align: right; padding: 0; }
     .precio input:focus-visible { outline: none; }
-    .precio-nota { grid-column: 2; justify-self: end; font-size: 0.7rem; color: var(--ink-mute); }
-    .fila-aviso { grid-column: 1 / -1; font-size: 0.74rem; color: var(--accent-2); font-weight: 500; }
-    .fila-aviso:empty { display: none; }
-    .fila.cambiado { background: rgba(185, 146, 79, 0.1); }
-    .fila.cambiado .precio.modificado { border-color: var(--accent-2); }
-    .fila.invalido .fila-aviso { color: var(--error); }
-
-    .editar {
-      margin-top: 0.55rem;
-      border: 0;
-      background: none;
-      padding: 0.2rem 0;
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .editar::before { content: "✎ "; }
-    .editar[aria-expanded="true"]::before { content: "▴ "; }
-    .edicion { display: grid; gap: 0.9rem; margin-top: 0.7rem; padding-top: 0.9rem; border-top: 1px dashed var(--line); }
-    .campo.modificado { color: var(--accent-2); }
-    .campo.modificado input, .campo.modificado textarea { border-color: var(--accent-2); }
-    .campo.invalido input { border-color: var(--error); }
-    .foto-campo { display: flex; gap: 0.9rem; align-items: center; }
-    .miniatura {
-      width: 110px;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      border-radius: 12px;
-      background: var(--sage);
-      border: 1px solid var(--line);
-      flex-shrink: 0;
-    }
-    .foto-acciones { display: grid; gap: 0.35rem; justify-items: start; }
-    .btn-foto { display: inline-block; padding: 0.55rem 1rem; font-size: 0.82rem; cursor: pointer; }
-    .foto-estado { font-size: 0.74rem; color: var(--ink-mute); font-weight: 400; }
-    .foto-fila .foto-campo { margin-top: 0.6rem; }
-    .nota-campo { font-weight: 400; color: var(--ink-mute); font-size: 0.74rem; }
-    .galeria-editor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; margin-top: 0.2rem; }
-    .gal-foto { position: relative; display: grid; gap: 0.3rem; margin: 0; }
-    .gal-foto img {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      border-radius: 12px;
-      background: var(--sage);
-      border: 1px solid var(--line);
-    }
-    .gal-foto.nueva img { border: 2px solid var(--accent-2); }
-    .gal-principal {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      padding: 0.1rem 0.45rem;
-      border-radius: 999px;
-      background: rgba(44, 42, 34, 0.75);
-      color: #fff;
-      font-size: 0.62rem;
-      font-weight: 600;
-    }
-    .gal-acciones { display: flex; justify-content: space-between; gap: 0.2rem; }
-    .gal-acciones button { border: 0; background: none; padding: 0.15rem 0; color: var(--accent); font-size: 0.72rem; font-weight: 600; }
-    .gal-acciones button[data-quitar] { color: var(--error); margin-left: auto; }
-    .gal-agregar {
-      display: grid;
-      place-items: center;
-      aspect-ratio: 1;
-      border: 1.5px dashed var(--accent);
-      border-radius: 12px;
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-align: center;
-      padding: 0.4rem;
-      cursor: pointer;
-      background: rgba(111, 107, 63, 0.04);
-    }
+    .servicio-edicion { display: grid; gap: 0.95rem; margin-top: 0.8rem; padding: 0.95rem; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; }
+    .servicio-edicion .campo input:not([type="checkbox"]), .servicio-edicion .campo textarea { background: #fff; }
+    .servicio-acciones { display: flex; flex-wrap: wrap; gap: 0.45rem; padding-top: 0.3rem; border-top: 1px dashed var(--line); }
+    .servicios > .mini-btn.agregar { margin-top: 0.9rem; }
 
     /* ---------- Barra inferior ---------- */
     .barra {
       position: fixed;
       inset: auto 0 0 0;
+      z-index: 10;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -222,7 +413,6 @@
       border-top: 1px solid var(--line);
       box-shadow: 0 -10px 30px -20px rgba(44, 42, 34, 0.4);
     }
-    /* Si los botones no dejan espacio, el mensaje pasa a su propia línea. */
     .barra-estado { flex: 1 1 9rem; font-size: 0.82rem; color: var(--ink-soft); }
     .barra-estado.ok { color: var(--accent); font-weight: 600; }
     .barra-estado.error { color: var(--error); font-weight: 600; }
@@ -231,7 +421,7 @@
 
     /* ---------- Confirmación ---------- */
     .dialogo {
-      width: min(460px, calc(100% - 2rem));
+      width: min(480px, calc(100% - 2rem));
       margin: auto; /* el reset de márgenes quita el centrado nativo del <dialog> */
       border: 0;
       border-radius: 20px;
@@ -241,22 +431,17 @@
     }
     .dialogo::backdrop { background: rgba(44, 42, 34, 0.5); }
     .dialogo h2 { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; margin-bottom: 0.9rem; }
-    .resumen { list-style: none; padding: 0; display: grid; gap: 0.6rem; max-height: 55vh; overflow: auto; }
-    .resumen li { display: grid; gap: 0.15rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); font-size: 0.86rem; }
-    .resumen .r-titulo { font-weight: 600; }
-    .resumen .r-detalle { color: var(--ink-soft); overflow-wrap: anywhere; }
-    .resumen s { color: var(--ink-mute); }
-    .resumen strong { color: var(--accent); }
-    .resumen .r-aviso { color: var(--error); font-weight: 600; font-size: 0.8rem; }
-    .resumen img { width: 88px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; margin-top: 0.3rem; }
-    .r-fotos { display: flex; gap: 0.4rem; }
-    .r-fotos img { width: 64px; aspect-ratio: 1; }
-    .dialogo-acciones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.1rem; }
+    .advertencias { list-style: none; padding: 0.7rem 0.9rem; margin-bottom: 0.8rem; display: grid; gap: 0.35rem; border-radius: 12px; background: rgba(168, 65, 47, 0.08); color: var(--error); font-size: 0.82rem; font-weight: 500; }
+    .resumen { list-style: none; padding: 0; display: grid; gap: 0.5rem; max-height: 50vh; overflow: auto; }
+    .resumen li { padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); font-size: 0.86rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+    .resumen strong { color: var(--ink); font-weight: 600; }
+    .dialogo-nota { margin-top: 0.8rem; font-size: 0.78rem; color: var(--ink-mute); }
+    .dialogo-acciones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
 
     @media (min-width: 560px) {
+      :root { --pad: 1.4rem; }
       .shell { padding-top: 2.5rem; }
       .card { padding: 2rem 1.75rem; }
-      .grupo { padding: 0; }
     }
   </style>
 </head>
@@ -271,10 +456,10 @@
 
     <form class="card login" data-vista="login" data-login hidden novalidate>
       <h1>Entrar</h1>
-      <label class="campo">Usuario
+      <label class="campo"><span class="campo-etiqueta">Usuario</span>
         <input name="usuario" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" />
       </label>
-      <label class="campo">Contraseña
+      <label class="campo"><span class="campo-etiqueta">Contraseña</span>
         <span class="clave">
           <input name="clave" type="password" autocomplete="current-password" />
           <button class="ver-clave" type="button" data-ver-clave aria-label="Mostrar contraseña">Ver</button>
@@ -284,19 +469,41 @@
       <button class="btn" type="submit" data-entrar>Entrar</button>
     </form>
 
-    <div class="card aviso" data-vista="aviso" hidden>
+    <div class="card mensaje-carga" data-vista="aviso" hidden>
       <p data-aviso></p>
     </div>
 
     <section data-vista="editor" hidden>
       <div class="intro">
-        <p>Cambia precios, nombres, descripciones y fotos, y toca <strong>Guardar y publicar</strong>. La página se actualiza sola en 1 o 2 minutos.</p>
+        <p>Toca una sección para abrirla, cambia lo que quieras y toca <strong>Guardar y publicar</strong>. La página se actualiza sola en 1 o 2 minutos.</p>
         <div class="intro-acciones">
           <a href="/" target="_blank" rel="noopener">Ver la página</a>
           <button class="link" type="button" data-salir>Salir</button>
         </div>
       </div>
-      <div data-grupos></div>
+
+      <details class="ayuda">
+        <summary>¿Cómo se usa el panel?</summary>
+        <div class="ayuda-cuerpo">
+          <ol>
+            <li>Las secciones están en el mismo orden en que aparecen en la página. Toca una para abrirla.</li>
+            <li>Lo que cambies se marca en dorado. Si te equivocas, toca <strong>Deshacer</strong>.</li>
+            <li>Cuando termines, toca <strong>Guardar y publicar</strong>. Antes de publicar te mostramos un resumen.</li>
+            <li>En 1 o 2 minutos los cambios aparecen solos en la página.</li>
+          </ol>
+          <ul>
+            <li><strong>Precios:</strong> escribe solo los números, sin puntos ni signos.</li>
+            <li><strong>Servicios:</strong> toca «Editar» para cambiar el nombre, la descripción y las fotos, subirlo o bajarlo en la lista, o eliminarlo. Para crear uno, usa «+ Agregar servicio» al final de cada sección.</li>
+            <li><strong>Fotos:</strong> cada servicio puede tener hasta 3 fotos o videos. El primero es el que se ve en la página; los demás aparecen al tocarlo.</li>
+            <li><strong>Videos:</strong> súbelo primero a tu Instagram, TikTok, YouTube o Facebook. Luego, en el video, toca <em>Compartir → Copiar enlace</em> y pégalo aquí.</li>
+            <li><strong>Ocultar una sección:</strong> apaga «Mostrar esta sección». No se borra nada y puedes volver a mostrarla cuando quieras.</li>
+            <li><strong>Promociones:</strong> en «Aviso o promoción» puedes poner una franja arriba de la página y apagarla cuando termine.</li>
+          </ul>
+          <p>Si no alcanzas a guardar (por ejemplo, si se cierra el navegador), el panel te ofrece recuperar tus cambios la próxima vez que entres en este mismo celular.</p>
+        </div>
+      </details>
+
+      <div data-secciones></div>
     </section>
   </main>
 
@@ -310,7 +517,9 @@
 
   <dialog class="dialogo" data-confirmar>
     <h2>¿Publicar estos cambios?</h2>
+    <ul class="advertencias" data-advertencias hidden></ul>
     <ul class="resumen" data-resumen></ul>
+    <p class="dialogo-nota">Se verán en la página en 1 o 2 minutos.</p>
     <div class="dialogo-acciones">
       <button class="btn btn-sec" type="button" data-cancelar>Revisar</button>
       <button class="btn" type="button" data-publicar>Sí, publicar</button>
@@ -322,59 +531,171 @@
       "use strict";
 
       var API = "/api/panel";
-      var MINIMO = 1000;
       var FOTO_LADO_MAX = 1400;     // px del lado más largo tras comprimir
-      var MINI_LADO_MAX = 480;      // px de la versión pequeña (miniaturas de masajes y faciales)
-      var FOTOS_POR_SERVICIO = 3;
-      var ENVIO_MAX = 3800000;      // bytes del pedido (Vercel acepta hasta 4,5 MB)
+      var MINI_LADO_MAX = 480;      // px de la versión pequeña (miniaturas)
+      var ENVIO_MAX = 3800000;      // bytes por guardado (Vercel acepta hasta 4,5 MB)
+      var FOTOS_POR_GUARDADO = 8;
+      var MAX_MEDIOS = 3;
+      var MAX_VIDEOS = 12;
+      var MAX_SERVICIOS = 40;
       var ALT_GENERAL = "Olivé Spa, spa a domicilio en Medellín";
-      var ETIQUETAS = { nombre: "Nombre", detalle: "Duración / detalle", descripcion: "Descripción" };
-      var ORDEN_CAMPOS = ["nombre", "detalle", "descripcion"];
+      var BORRADOR = "olive-panel-borrador";
+      var PLATAFORMAS = { youtube: "YouTube", instagram: "Instagram", tiktok: "TikTok", facebook: "Facebook", vimeo: "Vimeo" };
+      // Enlaces cortos: el servidor los convierte al enlace completo al guardar.
+      var CORTO = /^https?:\/\/((vm|vt)\.tiktok\.com\/|(www\.|m\.)?tiktok\.com\/t\/|fb\.watch\/|(www\.|m\.)?facebook\.com\/share\/[vr]\/)/i;
+      var LISTAS = ["lista", "horarios", "cifras", "pasos", "videos", "servicios"];
 
       var $ = function (sel, scope) { return (scope || document).querySelector(sel); };
       var $$ = function (sel, scope) { return Array.prototype.slice.call((scope || document).querySelectorAll(sel)); };
 
-      var servicios = [];   // ver leerModelo()
-      var fotosPagina = []; // fotos que no son de un servicio (portada, secciones)
+      var esquema = [];
+      var camposServicio = {};
+      var base = null;      // contenido publicado, tal como llegó del servidor
+      var datos = null;     // copia que se edita
+      var fotos = {};       // fotos nuevas sin guardar: clave → { url, datos, mini }
+      var previas = {};     // ruta recién publicada → vista previa (mientras Vercel la publica)
+      var controles = [];   // ver registrar()
+      var ganchos = [];     // actualizaciones de la vista después de cada cambio
+      var abiertos = {};    // secciones y servicios desplegados (se conservan al repintar)
+      var nuevos = typeof WeakMap === "function" ? new WeakMap() : null; // claves de servicios sin id
+      var intento = false;  // ya se intentó guardar: se muestran todos los errores
+      var enfocar = null;   // data-enfocar del campo que se enfoca después de repintar
+      var reposo = { texto: "Sin cambios", tipo: "" }; // mensaje de la barra cuando no hay cambios
+      var hayCambios = false;
+      var pendiente = null; // lo que se va a publicar, entre «Guardar» y «Sí, publicar»
+      var publicando = false;
       var ronda = 0;        // verificación de publicación en curso
+      var contador = 0;
+      var tBorrador = null;
       var dialogo = $("[data-confirmar]");
       var login = $("[data-login]");
+      var contenedor = $("[data-secciones]");
 
-      function crear(etiqueta, clase, html) {
+      /* ---------- Utilidades ---------- */
+      function crear(etiqueta, clase, texto) {
         var el = document.createElement(etiqueta);
         if (clase) el.className = clase;
-        if (html) el.innerHTML = html;
+        if (texto != null) el.textContent = texto;
         return el;
       }
-      function formatear(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
-      function numero(texto) { var d = String(texto).replace(/\D/g, ""); return d ? parseInt(d, 10) : 0; }
-      /* La cajita crece con el precio para que el $ quede pegado al número. */
-      function ajustar(input) { input.style.width = Math.max(input.value.length, 5) + 0.6 + "ch"; }
-      /* La casilla de descripción crece con el texto para que se lea completo. */
-      function crecer(area) {
-        if (area.tagName !== "TEXTAREA" || !area.offsetParent) return;
-        area.style.height = "auto";
-        area.style.height = area.scrollHeight + 2 + "px";
+      function boton(texto, alClic, clase) {
+        var b = crear("button", clase || "mini-btn", texto);
+        b.type = "button";
+        b.addEventListener("click", alClic);
+        return b;
       }
+      function copia(v) { return JSON.parse(JSON.stringify(v)); }
+      function canonico(v) {
+        if (Array.isArray(v)) return v.map(canonico);
+        if (v && typeof v === "object") {
+          return Object.keys(v).sort().reduce(function (o, k) { o[k] = canonico(v[k]); return o; }, {});
+        }
+        return v;
+      }
+      function igual(a, b) { return JSON.stringify(canonico(a)) === JSON.stringify(canonico(b)); }
+      function formatear(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+      function numero(texto) { var d = String(texto == null ? "" : texto).replace(/\D/g, "").slice(0, 9); return d ? parseInt(d, 10) : 0; }
       /* Misma limpieza que hace el servidor, para saber si un texto cambió de verdad. */
-      function normalizar(valor, campo) {
-        var t = String(valor || "").replace(/\r\n?/g, "\n");
-        if (campo === "descripcion") {
+      function limpio(valor, variasLineas) {
+        var t = String(valor == null ? "" : valor).replace(/\r\n?/g, "\n");
+        if (variasLineas) {
           return t.split("\n").map(function (l) { return l.replace(/\s+/g, " ").trim(); }).join("\n").replace(/\n{3,}/g, "\n\n").trim();
         }
         return t.replace(/\s+/g, " ").trim();
       }
-      function textoDe(el) {
-        var copia = el.cloneNode(true);
-        $$("br", copia).forEach(function (br) { br.replaceWith("\n"); });
-        return copia.textContent;
+      /* La cajita del precio crece con el número para que el $ quede pegado. */
+      function ajustar(input) { input.style.width = Math.max(input.value.length, 5) + 0.6 + "ch"; }
+      /* Las casillas de texto largo crecen con el texto para que se lea completo. */
+      function crecer(area) {
+        if (!area || area.tagName !== "TEXTAREA" || !area.offsetParent) return;
+        area.style.height = "auto";
+        area.style.height = area.scrollHeight + 2 + "px";
       }
-      function urlSitio(ruta) { return new URL(ruta, location.origin + "/").href; }
-      function resumir(texto, max) {
-        var linea = texto.replace(/\s+/g, " ").trim();
-        return linea.length > max ? linea.slice(0, max - 1) + "…" : linea;
+      function mover(lista, i, d) {
+        var j = i + d;
+        if (j < 0 || j >= lista.length) return;
+        var x = lista[i];
+        lista[i] = lista[j];
+        lista[j] = x;
+      }
+      function seccionDe(clave) { return esquema.filter(function (s) { return s.clave === clave; })[0]; }
+      function seccionesServicios() { return esquema.filter(function (s) { return s.servicios; }).map(function (s) { return s.clave; }); }
+      function totalServicios() {
+        return seccionesServicios().reduce(function (n, k) {
+          return n + (datos[k].visible && datos[k].servicios.length ? datos[k].servicios.length : 0);
+        }, 0);
+      }
+      function claveServicio(s) {
+        if (s.id) return s.id;
+        if (!nuevos) return "nuevo";
+        if (!nuevos.has(s)) nuevos.set(s, "nuevo-" + ++contador);
+        return nuevos.get(s);
+      }
+      function servicioBase(clave, s) {
+        if (!s.id) return null;
+        return base[clave].servicios.filter(function (b) { return b.id === s.id; })[0] || null;
+      }
+      function srcFoto(f, mini) {
+        if (!f) return "";
+        if (f.nueva) return fotos[f.nueva] ? fotos[f.nueva].url : "";
+        var ruta = mini && f.mini ? f.mini : f.grande;
+        return previas[ruta] || previas[f.grande] || "/" + ruta;
+      }
+      function firmaFoto(f) { return f ? f.nueva || f.grande || "" : ""; }
+      function firmaMedios(lista) {
+        return (lista || []).map(function (m) { return m.tipo === "video" ? "v:" + String(m.url || "").trim() : "f:" + firmaFoto(m); }).join("|");
       }
 
+      /* Reconoce un enlace de video (igual que el servidor). */
+      function analizarVideo(url) {
+        var texto = String(url || "").trim();
+        var u;
+        try { u = new URL(texto); } catch (_) { return null; }
+        if (!/^https?:$/.test(u.protocol)) return null;
+        var host = u.hostname.toLowerCase().replace(/^(www|m|mobile)\./, "");
+        var m;
+        var yt = function (id, vertical) { return /^[\w-]{6,20}$/.test(id || "") ? { plataforma: "youtube", id: id, vertical: vertical } : null; };
+        if (host === "youtu.be") return yt(u.pathname.slice(1).split("/")[0], false);
+        if (host === "youtube.com" || host === "youtube-nocookie.com") {
+          if ((m = /^\/shorts\/([\w-]+)/.exec(u.pathname))) return yt(m[1], true);
+          if ((m = /^\/(?:embed|live)\/([\w-]+)/.exec(u.pathname))) return yt(m[1], false);
+          return yt(u.searchParams.get("v"), false);
+        }
+        if ((host === "vimeo.com" || host === "player.vimeo.com") && (m = /\/(\d{5,})/.exec(u.pathname))) return { plataforma: "vimeo", id: m[1], vertical: false };
+        if (host === "instagram.com" && (m = /^\/(p|reel|reels|tv)\/([\w-]+)/.exec(u.pathname))) return { plataforma: "instagram", id: m[2], vertical: true };
+        if (host === "tiktok.com" && (m = /\/video\/(\d{6,})/.exec(u.pathname))) return { plataforma: "tiktok", id: m[1], vertical: true };
+        if (host === "facebook.com" || host === "web.facebook.com") {
+          if ((m = /^\/reel\/(\d{6,})/.exec(u.pathname))) return { plataforma: "facebook", id: m[1], vertical: true };
+          if ((m = /\/videos\/(?:[\w.-]+\/)?(\d{6,})/.exec(u.pathname))) return { plataforma: "facebook", id: m[1], vertical: false };
+          if (/^\/watch\/?$/.test(u.pathname) && /^\d{6,}$/.test(u.searchParams.get("v") || "")) return { plataforma: "facebook", id: u.searchParams.get("v"), vertical: false };
+        }
+        if (CORTO.test(texto)) return { plataforma: /tiktok/i.test(u.hostname) ? "tiktok" : "facebook", id: "", vertical: true, corto: true };
+        return null;
+      }
+      function nombreVideo(info) {
+        if (!info) return "Enlace no reconocido";
+        var n = PLATAFORMAS[info.plataforma];
+        return info.corto ? n + " (enlace corto: se completa al guardar)" : n + (info.vertical ? " · vertical" : "");
+      }
+      function miniaturaVideo(url) {
+        var info = analizarVideo(url);
+        var el = crear("span", "video-mini");
+        if (info && info.plataforma === "youtube") {
+          el.className += " youtube";
+          el.style.backgroundImage = "url('https://i.ytimg.com/vi/" + info.id + "/hqdefault.jpg')";
+        }
+        else el.appendChild(crear("span", "video-mini-nombre", info ? PLATAFORMAS[info.plataforma] : "Video"));
+        return el;
+      }
+      /* Del texto que se pega (a veces trae palabras antes del enlace), toma solo el enlace. */
+      function extraerEnlace(texto) {
+        var t = String(texto || "").trim();
+        var m = /https?:\/\/\S+/i.exec(t);
+        if (m) return m[0];
+        return t && !/\s/.test(t) ? "https://" + t.replace(/^\/+/, "") : t;
+      }
+
+      /* ---------- Vistas y servidor ---------- */
       function mostrar(vista) {
         $$("[data-vista]").forEach(function (el) { el.hidden = el.getAttribute("data-vista") !== vista; });
         $("[data-barra]").hidden = vista !== "editor";
@@ -384,69 +705,22 @@
         el.textContent = texto;
         el.className = "barra-estado" + (tipo ? " " + tipo : "");
       }
-      function aviso(texto) {
+      function avisoCarga(texto) {
         $("[data-aviso]").textContent = texto;
         mostrar("aviso");
       }
-
-      function api(metodo, accion, datos) {
+      function api(metodo, accion, cuerpo) {
         return fetch(API + (accion ? "?accion=" + accion : ""), {
           method: metodo,
           credentials: "same-origin",
           cache: "no-store",
-          headers: datos ? { "Content-Type": "application/json" } : {},
-          body: datos ? JSON.stringify(datos) : undefined
+          headers: cuerpo ? { "Content-Type": "application/json" } : {},
+          body: cuerpo ? (typeof cuerpo === "string" ? cuerpo : JSON.stringify(cuerpo)) : undefined
         }).then(function (r) {
-          return r.json().catch(function () { return {}; }).then(function (cuerpo) {
-            return { estado: r.status, cuerpo: cuerpo };
+          return r.json().catch(function () { return {}; }).then(function (datosRespuesta) {
+            return { estado: r.status, cuerpo: datosRespuesta };
           });
         });
-      }
-
-      /* Lee de la página lo que se puede editar: data-tarifa, data-texto, data-galeria y data-foto. */
-      function leerModelo(html) {
-        var doc = new DOMParser().parseFromString(html, "text/html");
-        var porId = {};
-        var orden = [];
-        function servicio(id, el) {
-          if (!porId[id]) {
-            var seccion = el.closest("section");
-            var kicker = seccion && seccion.querySelector(".kicker");
-            porId[id] = { id: id, grupo: kicker ? kicker.textContent.trim() : "Otros", precio: null, campos: {}, foto: null, galeria: null };
-            orden.push(id);
-          }
-          return porId[id];
-        }
-        $$("[data-tarifa]", doc).forEach(function (el) {
-          var s = servicio(el.getAttribute("data-tarifa"), el);
-          var siguiente = el.nextElementSibling;
-          s.precio = { base: numero(el.textContent), nota: siguiente && siguiente.tagName === "SMALL" ? siguiente.textContent.trim() : "" };
-        });
-        $$("[data-texto]", doc).forEach(function (el) {
-          var partes = el.getAttribute("data-texto").split(":");
-          servicio(partes[0], el).campos[partes[1]] = { base: normalizar(textoDe(el), partes[1]) };
-        });
-        $$("[data-galeria]", doc).forEach(function (el) {
-          var fotosGaleria = $$("img", el).map(function (img) {
-            return { grande: img.getAttribute("data-grande") || img.getAttribute("src"), src: img.getAttribute("src") };
-          });
-          servicio(el.getAttribute("data-galeria"), el).galeria = {
-            base: fotosGaleria.map(function (f) { return f.grande; }),
-            lista: fotosGaleria
-          };
-        });
-        var fotos = [];
-        $$("img[data-foto]", doc).forEach(function (el) {
-          var id = el.getAttribute("data-foto");
-          var foto = { id: id, src: el.getAttribute("src"), etiqueta: el.getAttribute("data-foto-etiqueta") || "", pendiente: null };
-          if (porId[id]) porId[id].foto = foto;
-          else fotos.push(foto);
-        });
-        return { servicios: orden.map(function (id) { return porId[id]; }), fotos: fotos };
-      }
-
-      function nombreActual(s) {
-        return s.campos.nombre ? normalizar(s.campos.nombre.input.value, "nombre") || s.campos.nombre.base : s.id;
       }
 
       /* Convierte la foto elegida a JPEG liviano: grande (máx. 1400 px) y pequeña (máx. 480 px). */
@@ -465,7 +739,7 @@
               g.imageSmoothingQuality = "high";
               g.drawImage(img, 0, 0, lienzo.width, lienzo.height);
               var datosUrl = lienzo.toDataURL("image/jpeg", calidad);
-              if (datosUrl.length > 3500000) datosUrl = lienzo.toDataURL("image/jpeg", 0.7);
+              if (datosUrl.length > 1400000) datosUrl = lienzo.toDataURL("image/jpeg", 0.7);
               return datosUrl;
             };
             var grande = version(FOTO_LADO_MAX, 0.82);
@@ -477,311 +751,899 @@
           img.src = url;
         });
       }
+      function agregarFotos(lista, maximo, alListo, nota) {
+        var archivos = Array.prototype.slice.call(lista || []).slice(0, maximo);
+        if (!archivos.length) return;
+        nota.textContent = archivos.length > 1 ? "Preparando las fotos…" : "Preparando la foto…";
+        Promise.all(archivos.map(prepararFoto)).then(function (listas) {
+          nota.textContent = "";
+          alListo(listas.map(function (f) {
+            var clave = "f" + Date.now().toString(36) + "-" + ++contador;
+            fotos[clave] = f;
+            return clave;
+          }));
+        }).catch(function (error) { nota.textContent = error.message; });
+      }
 
-      /* Casilla de foto: miniatura + botón para elegir otra. `foto` es el objeto del modelo. */
-      function campoFoto(foto) {
-        var caja = crear("div", "foto-campo",
-          '<img class="miniatura" alt="" />' +
-          '<div class="foto-acciones">' +
-            '<label class="btn btn-sec btn-foto">Cambiar foto<input type="file" accept="image/*" hidden /></label>' +
-            '<button class="link" type="button" hidden>Quitar foto nueva</button>' +
-            '<p class="foto-estado">Se ajusta sola al tamaño de la página.</p>' +
-          "</div>");
-        var mini = $(".miniatura", caja);
-        var entrada = $("input", caja);
-        var quitar = $("button", caja);
-        var texto = $(".foto-estado", caja);
-        mini.src = urlSitio(foto.src);
-        foto.mini = mini;
-        foto.reiniciar = function () {
-          foto.pendiente = null;
-          mini.src = foto.previa || urlSitio(foto.src);
-          quitar.hidden = true;
-          entrada.value = "";
-          texto.textContent = "Se ajusta sola al tamaño de la página.";
+      /* ---------- Registro de campos: cada uno sabe si cambió y si tiene un error ---------- */
+      function registrar(c) { controles.push(c); return c; }
+
+      function refrescar() {
+        var secciones = {};
+        var grupos = {};
+        var errores = 0;
+        var visibles = 0;
+        hayCambios = false;
+        controles.forEach(function (c) {
+          var cambiado = c.cambiado();
+          var error = c.error ? c.error() : "";
+          var visible = error && (intento || c.tocado) ? error : "";
+          if (c.caja) {
+            c.caja.classList.toggle("modificado", cambiado && !visible);
+            c.caja.classList.toggle("invalido", !!visible);
+          }
+          if (c.msg) c.msg.textContent = visible;
+          if (c.alPintar) c.alPintar(cambiado, visible);
+          [secciones, grupos].forEach(function (mapa, i) {
+            var clave = i ? c.grupo : c.seccion;
+            if (!clave) return;
+            var e = mapa[clave] || (mapa[clave] = { cambios: false, errores: false });
+            if (cambiado) e.cambios = true;
+            if (visible) e.errores = true;
+          });
+          if (cambiado) hayCambios = true;
+          if (error) errores++;
+          if (visible) visibles++;
+        });
+        ganchos.forEach(function (g) { g.fn(secciones[g.seccion] || {}, grupos); });
+        var n = Object.keys(secciones).filter(function (k) { return secciones[k].cambios; }).length;
+        $("[data-guardar]").disabled = !hayCambios;
+        $("[data-deshacer]").hidden = !hayCambios;
+        if (visibles) estado("Revisa lo marcado en rojo", "error");
+        else if (hayCambios) estado(n === 1 ? "Cambios sin guardar en 1 sección" : "Cambios sin guardar en " + n + " secciones");
+        else estado(reposo.texto, reposo.tipo);
+        return { errores: errores };
+      }
+
+      function cambio() {
+        refrescar();
+        clearTimeout(tBorrador);
+        tBorrador = setTimeout(guardarBorrador, 700);
+      }
+
+      function envolver(def, control, contenido) {
+        var caja = crear("div", "campo");
+        var id = "c" + ++contador;
+        var etiqueta = crear("label", "campo-etiqueta", def.etiqueta);
+        etiqueta.htmlFor = id;
+        control.id = id;
+        caja.appendChild(etiqueta);
+        caja.appendChild(contenido || control);
+        var msg = crear("p", "campo-error");
+        caja.appendChild(msg);
+        return { caja: caja, msg: msg };
+      }
+
+      /* ---------- Campos ---------- */
+      function campo(def, obj, k, seccion, original, grupo) {
+        switch (def.tipo) {
+          case "interruptor": return campoInterruptor(def, obj, k, seccion, original);
+          case "foto": return campoFoto(def, obj, k, seccion, original);
+          case "telefono": return campoTelefono(def, obj, k, seccion, original);
+          case "lista": return campoLista(def, obj, k, seccion, original);
+          case "horarios": return campoHorarios(def, obj, k, seccion, original);
+          case "cifras": return campoCifras(def, obj, k, seccion, original);
+          case "pasos": return campoPasos(def, obj, k, seccion, original);
+          case "videos": return campoVideos(def, obj, k, seccion, original);
+          case "servicios": return campoServicios(def, obj, k, seccion);
+          default: return campoTexto(def, obj, k, seccion, original, grupo);
+        }
+      }
+
+      function campoTexto(def, obj, k, seccion, original, grupo) {
+        var varias = def.tipo === "parrafo";
+        // Los textos de una línea pero largos se muestran completos (en el celular no caben en una línea).
+        var largo = def.tipo === "texto" && def.max >= 90;
+        var input = crear(varias || largo ? "textarea" : "input");
+        if (largo) { input.className = "una-linea"; input.rows = 1; }
+        else if (!varias) input.type = def.tipo === "email" ? "email" : def.tipo === "url" ? "url" : "text";
+        if (def.tipo === "email") input.autocomplete = "email";
+        if (def.tipo === "url") { input.inputMode = "url"; input.placeholder = "https://"; input.autocapitalize = "none"; }
+        if (def.max) input.maxLength = def.max;
+        if (def.ejemplo) input.placeholder = "Ej.: " + def.ejemplo;
+        input.value = obj[k] == null ? "" : obj[k];
+        if (grupo) input.setAttribute("data-enfocar", grupo + ":" + k);
+        var partes = envolver(def, input);
+        var c = registrar({
+          seccion: seccion,
+          grupo: grupo,
+          caja: partes.caja,
+          msg: partes.msg,
+          cambiado: function () { return limpio(obj[k], varias) !== limpio(original(), varias); },
+          error: function () {
+            var t = limpio(obj[k], varias);
+            if (!t) return def.obligatorio ? "Este campo no puede quedar vacío" : "";
+            if (def.tipo === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return "Revisa el correo";
+            if (def.tipo === "url" && !/^https:\/\/[^\s/]+\.[^\s]+$/i.test(t)) return "Debe ser un enlace completo, que empiece por https://";
+            return "";
+          }
+        });
+        input.addEventListener("input", function () {
+          if (largo && /\n/.test(input.value)) input.value = input.value.replace(/\s*\n\s*/g, " ");
+          obj[k] = input.value;
+          crecer(input);
+          cambio();
+        });
+        if (largo) input.addEventListener("keydown", function (e) { if (e.key === "Enter") e.preventDefault(); });
+        input.addEventListener("blur", function () {
+          if (def.tipo === "url") {
+            var t = limpio(input.value);
+            if (t && !/^https?:\/\//i.test(t)) t = "https://" + t;
+            input.value = t.replace(/^http:\/\//i, "https://");
+            obj[k] = input.value;
+          }
+          c.tocado = true;
+          cambio();
+        });
+        return partes.caja;
+      }
+
+      function campoInterruptor(def, obj, k, seccion, original) {
+        var caja = crear("label", "interruptor");
+        var input = crear("input");
+        input.type = "checkbox";
+        input.setAttribute("role", "switch");
+        input.checked = obj[k] === true;
+        caja.appendChild(crear("span", "", def.etiqueta));
+        caja.appendChild(input);
+        registrar({ seccion: seccion, caja: caja, cambiado: function () { return (obj[k] === true) !== (original() === true); } });
+        input.addEventListener("change", function () { obj[k] = input.checked; cambio(); });
+        return caja;
+      }
+
+      function campoTelefono(def, obj, k, seccion, original) {
+        var local = function (v) {
+          var d = String(v || "").replace(/\D/g, "");
+          return d.length === 12 && d.indexOf("57") === 0 ? d.slice(2) : d;
         };
+        var formato = function (d) { return d.length === 10 ? d.slice(0, 3) + " " + d.slice(3, 6) + " " + d.slice(6) : d; };
+        var input = crear("input");
+        input.type = "tel";
+        input.inputMode = "numeric";
+        input.autocomplete = "off";
+        input.maxLength = 18;
+        input.placeholder = "300 123 4567";
+        input.value = formato(local(obj[k]));
+        var caja = crear("span", "telefono");
+        caja.appendChild(crear("span", "telefono-prefijo", "+57"));
+        caja.appendChild(input);
+        var partes = envolver(def, input, caja);
+        var c = registrar({
+          seccion: seccion,
+          caja: partes.caja,
+          msg: partes.msg,
+          cambiado: function () { return local(obj[k]) !== local(original()); },
+          error: function () {
+            var d = local(obj[k]);
+            if (!d) return def.obligatorio ? "Escribe el número" : "";
+            return /^\d{10}$/.test(d) ? "" : "Escribe los 10 números del celular";
+          }
+        });
+        input.addEventListener("input", function () { var d = local(input.value); obj[k] = d ? "57" + d : ""; cambio(); });
+        input.addEventListener("blur", function () { input.value = formato(local(obj[k])); c.tocado = true; cambio(); });
+        return partes.caja;
+      }
+
+      function campoFoto(def, obj, k, seccion, original) {
+        var caja = crear("div", "campo");
+        caja.appendChild(crear("p", "campo-etiqueta", def.etiqueta));
+        var fila = crear("div", "foto-campo");
+        var img = crear("img", "miniatura");
+        img.alt = "";
+        img.loading = "lazy";
+        img.src = srcFoto(obj[k], true);
+        var acciones = crear("div", "foto-acciones");
+        var cambiar = crear("label", "btn btn-sec btn-foto", "Cambiar foto");
+        var entrada = crear("input");
+        entrada.type = "file";
+        entrada.accept = "image/*";
+        entrada.hidden = true;
+        cambiar.appendChild(entrada);
+        var nota = crear("p", "campo-nota");
+        var deshacer = boton("Deshacer", function () {
+          obj[k] = copia(original());
+          img.src = srcFoto(obj[k], true);
+          cambio();
+        }, "link");
         entrada.addEventListener("change", function () {
-          var archivo = entrada.files && entrada.files[0];
-          if (!archivo) return;
-          texto.textContent = "Preparando la foto…";
-          prepararFoto(archivo).then(function (lista) {
-            foto.pendiente = lista;
-            mini.src = lista.url;
-            quitar.hidden = false;
-            texto.textContent = "Foto nueva lista para publicar.";
-            actualizar();
-          }).catch(function (error) {
-            texto.textContent = error.message;
+          agregarFotos(entrada.files, 1, function (claves) {
+            obj[k] = { nueva: claves[0], alt: ALT_GENERAL };
+            img.src = srcFoto(obj[k], true);
+            cambio();
+          }, nota);
+          entrada.value = "";
+        });
+        acciones.appendChild(cambiar);
+        acciones.appendChild(deshacer);
+        fila.appendChild(img);
+        fila.appendChild(acciones);
+        caja.appendChild(fila);
+        caja.appendChild(nota);
+        registrar({
+          seccion: seccion,
+          caja: caja,
+          cambiado: function () { return firmaFoto(obj[k]) !== firmaFoto(original()); },
+          alPintar: function (cambiado) { deshacer.hidden = !cambiado; }
+        });
+        return caja;
+      }
+
+      function miniCampo(etiqueta, obj, k, max, marca, ejemplo, varias) {
+        var lab = crear("label", "mini-campo");
+        lab.appendChild(crear("span", "", etiqueta));
+        var input = crear(varias ? "textarea" : "input");
+        if (!varias) input.type = "text";
+        input.maxLength = max;
+        input.value = obj[k] == null ? "" : obj[k];
+        if (ejemplo) input.placeholder = ejemplo;
+        if (marca) input.setAttribute("data-enfocar", marca);
+        input.addEventListener("input", function () { obj[k] = input.value; crecer(input); cambio(); });
+        lab.appendChild(input);
+        return lab;
+      }
+      function casilla(texto, valor, alCambiar) {
+        var lab = crear("label", "casilla");
+        var input = crear("input");
+        input.type = "checkbox";
+        input.checked = !!valor;
+        input.addEventListener("change", function () { alCambiar(input.checked); });
+        lab.appendChild(input);
+        lab.appendChild(crear("span", "", texto));
+        return lab;
+      }
+      function bloqueLista(def, seccion) {
+        var caja = crear("div", "campo");
+        caja.appendChild(crear("p", "campo-etiqueta", def.etiqueta));
+        return caja;
+      }
+      function finLista(caja, seccion, cambiado, error) {
+        var msg = crear("p", "campo-error");
+        caja.appendChild(msg);
+        registrar({ seccion: seccion, caja: caja, msg: msg, cambiado: cambiado, error: error, tocado: false });
+        return caja;
+      }
+
+      function campoLista(def, obj, k, seccion, original) {
+        var lista = obj[k];
+        var caja = bloqueLista(def, seccion);
+        var filas = crear("div", "lista");
+        lista.forEach(function (valor, i) {
+          var fila = crear("div", "lista-fila");
+          var input = crear("input");
+          input.type = "text";
+          input.maxLength = def.max;
+          input.value = valor;
+          input.setAttribute("aria-label", def.etiqueta + " " + (i + 1));
+          input.setAttribute("data-enfocar", seccion + ":" + k + ":" + i);
+          input.addEventListener("input", function () { lista[i] = input.value; cambio(); });
+          fila.appendChild(input);
+          if (lista.length > (def.minItems || 0)) {
+            fila.appendChild(boton("Quitar", function () { lista.splice(i, 1); repintar(seccion); cambio(); }, "mini-btn peligro"));
+          }
+          filas.appendChild(fila);
+        });
+        caja.appendChild(filas);
+        if (lista.length < def.maxItems) {
+          caja.appendChild(boton("+ Agregar", function () {
+            lista.push("");
+            enfocar = seccion + ":" + k + ":" + (lista.length - 1);
+            repintar(seccion);
+            cambio();
+          }, "mini-btn agregar"));
+        }
+        var limpia = function (l) { return (l || []).map(function (t) { return limpio(t); }).filter(Boolean); };
+        return finLista(caja, seccion,
+          function () { return !igual(limpia(lista), limpia(original())); },
+          function () { return def.minItems && limpia(lista).length < def.minItems ? "Escribe al menos " + def.minItems : ""; });
+      }
+
+      function campoHorarios(def, obj, k, seccion, original) {
+        var lista = obj[k];
+        var caja = bloqueLista(def, seccion);
+        lista.forEach(function (h, i) {
+          var bloque = crear("div", "bloque");
+          bloque.appendChild(miniCampo("Días", h, "dias", 40, seccion + ":" + k + ":" + i, "Lunes a sábado"));
+          bloque.appendChild(miniCampo("Días en corto (para la portada)", h, "corto", 24, null, "Lun – Sáb"));
+          bloque.appendChild(miniCampo("Horas", h, "horas", 40, null, "8:00 a.m. – 7:00 p.m."));
+          var acciones = crear("div", "bloque-acciones");
+          if (i > 0) acciones.appendChild(boton("↑ Subir", function () { mover(lista, i, -1); repintar(seccion); cambio(); }));
+          acciones.appendChild(boton("Quitar este horario", function () { lista.splice(i, 1); repintar(seccion); cambio(); }, "mini-btn peligro"));
+          bloque.appendChild(acciones);
+          caja.appendChild(bloque);
+        });
+        if (lista.length < 4) {
+          caja.appendChild(boton("+ Agregar horario", function () {
+            lista.push({ dias: "", corto: "", horas: "" });
+            enfocar = seccion + ":" + k + ":" + (lista.length - 1);
+            repintar(seccion);
+            cambio();
+          }, "mini-btn agregar"));
+        }
+        var normal = function (l) { return (l || []).map(function (h) { return { dias: limpio(h.dias), corto: limpio(h.corto), horas: limpio(h.horas) }; }); };
+        return finLista(caja, seccion,
+          function () { return !igual(normal(lista), normal(original())); },
+          function () { return lista.some(function (h) { return !limpio(h.dias) || !limpio(h.horas); }) ? "Completa los días y las horas de cada horario" : ""; });
+      }
+
+      function campoCifras(def, obj, k, seccion, original) {
+        var lista = obj[k];
+        var caja = bloqueLista(def, seccion);
+        lista.forEach(function (cifra, i) {
+          var bloque = crear("div", "bloque");
+          bloque.appendChild(crear("p", "bloque-num", "Cifra " + (i + 1)));
+          var lab = crear("label", "mini-campo");
+          lab.appendChild(crear("span", "", "Número"));
+          var num = crear("input");
+          num.type = "text";
+          num.inputMode = "numeric";
+          num.maxLength = 5;
+          num.value = cifra.auto ? "" : String(cifra.numero == null ? "" : cifra.numero);
+          num.disabled = cifra.auto === true;
+          num.addEventListener("input", function () {
+            num.value = num.value.replace(/\D/g, "");
+            cifra.numero = num.value === "" ? null : Number(num.value);
+            cambio();
+          });
+          lab.appendChild(num);
+          bloque.appendChild(lab);
+          bloque.appendChild(miniCampo("Texto", cifra, "texto", 40));
+          bloque.appendChild(casilla("Mostrar «+» junto al número", cifra.mas, function (v) { cifra.mas = v; cambio(); }));
+          bloque.appendChild(casilla("Contar los servicios automáticamente", cifra.auto, function (v) {
+            cifra.auto = v;
+            num.disabled = v;
+            if (v) num.value = "";
+            else { cifra.numero = totalServicios(); num.value = String(cifra.numero); }
+            cambio();
+          }));
+          caja.appendChild(bloque);
+          ganchos.push({ seccion: seccion, fn: function () { num.placeholder = cifra.auto ? String(totalServicios()) : ""; } });
+        });
+        var normal = function (l) {
+          return (l || []).map(function (c) { return { numero: c.auto ? 0 : Number(c.numero), texto: limpio(c.texto), mas: c.mas === true, auto: c.auto === true }; });
+        };
+        return finLista(caja, seccion,
+          function () { return !igual(normal(lista), normal(original())); },
+          function () {
+            return lista.some(function (c) {
+              return !limpio(c.texto) || (!c.auto && !(typeof c.numero === "number" && c.numero >= 0 && c.numero <= 99999 && c.numero % 1 === 0));
+            }) ? "Completa el número y el texto de cada cifra" : "";
+          });
+      }
+
+      function campoPasos(def, obj, k, seccion, original) {
+        var lista = obj[k];
+        var caja = bloqueLista(def, seccion);
+        lista.forEach(function (p, i) {
+          var bloque = crear("div", "bloque");
+          bloque.appendChild(crear("p", "bloque-num", "Paso " + (i + 1)));
+          bloque.appendChild(miniCampo("Título", p, "titulo", 40, seccion + ":" + k + ":" + i));
+          bloque.appendChild(miniCampo("Texto", p, "texto", 200, null, null, true));
+          var acciones = crear("div", "bloque-acciones");
+          if (i > 0) acciones.appendChild(boton("↑ Subir", function () { mover(lista, i, -1); repintar(seccion); cambio(); }));
+          if (i < lista.length - 1) acciones.appendChild(boton("↓ Bajar", function () { mover(lista, i, 1); repintar(seccion); cambio(); }));
+          if (lista.length > 1) acciones.appendChild(boton("Quitar", function () { lista.splice(i, 1); repintar(seccion); cambio(); }, "mini-btn peligro"));
+          bloque.appendChild(acciones);
+          caja.appendChild(bloque);
+        });
+        if (lista.length < 4) {
+          caja.appendChild(boton("+ Agregar paso", function () {
+            lista.push({ titulo: "", texto: "" });
+            enfocar = seccion + ":" + k + ":" + (lista.length - 1);
+            repintar(seccion);
+            cambio();
+          }, "mini-btn agregar"));
+        }
+        var normal = function (l) { return (l || []).map(function (p) { return { titulo: limpio(p.titulo), texto: limpio(p.texto, true) }; }); };
+        return finLista(caja, seccion,
+          function () { return !igual(normal(lista), normal(original())); },
+          function () { return lista.some(function (p) { return !limpio(p.titulo); }) ? "Cada paso necesita un título" : ""; });
+      }
+
+      function formVideo(alAgregar, textoBoton, alCancelar) {
+        var caja = crear("div", "video-form");
+        var fila = crear("div", "video-form-fila");
+        var input = crear("input");
+        input.type = "url";
+        input.inputMode = "url";
+        input.autocomplete = "off";
+        input.autocapitalize = "none";
+        input.placeholder = "Pega aquí el enlace del video";
+        input.setAttribute("aria-label", "Enlace del video");
+        var msg = crear("p", "campo-error");
+        var agregar = boton(textoBoton, function () {
+          var url = extraerEnlace(input.value);
+          if (!url) { msg.textContent = "Pega el enlace del video."; return; }
+          if (!analizarVideo(url)) {
+            msg.textContent = "No reconozco ese enlace. Abre el video en Instagram, TikTok, YouTube, Facebook o Vimeo, toca Compartir → Copiar enlace, y pégalo aquí.";
+            return;
+          }
+          alAgregar(url);
+        }, "btn");
+        input.addEventListener("input", function () { msg.textContent = ""; });
+        input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); agregar.click(); } });
+        fila.appendChild(input);
+        fila.appendChild(agregar);
+        caja.appendChild(fila);
+        if (alCancelar) caja.appendChild(boton("Cancelar", alCancelar, "link"));
+        caja.appendChild(msg);
+        caja.entrada = input;
+        return caja;
+      }
+
+      function campoVideos(def, obj, k, seccion, original) {
+        var lista = obj[k];
+        var caja = crear("div", "campo");
+        caja.appendChild(crear("p", "campo-etiqueta", def.etiqueta + " · " + lista.length + " de " + MAX_VIDEOS));
+        if (!lista.length) caja.appendChild(crear("p", "vacio", "Todavía no hay videos. Pega abajo el enlace del primero."));
+        lista.forEach(function (v, i) {
+          var item = crear("div", "video-item");
+          var info = analizarVideo(v.url);
+          item.appendChild(miniaturaVideo(v.url));
+          var cuerpo = crear("div", "video-datos");
+          var linea = crear("p", "video-plataforma");
+          var enlace = crear("a", "", nombreVideo(info));
+          enlace.href = v.url;
+          enlace.target = "_blank";
+          enlace.rel = "noopener";
+          linea.appendChild(enlace);
+          cuerpo.appendChild(linea);
+          var titulo = crear("input");
+          titulo.type = "text";
+          titulo.maxLength = 90;
+          titulo.placeholder = "Título (opcional)";
+          titulo.value = v.titulo || "";
+          titulo.setAttribute("aria-label", "Título del video " + (i + 1));
+          titulo.addEventListener("input", function () { v.titulo = titulo.value; cambio(); });
+          cuerpo.appendChild(titulo);
+          var acciones = crear("div", "bloque-acciones");
+          if (i > 0) acciones.appendChild(boton("↑ Subir", function () { mover(lista, i, -1); repintar(seccion); cambio(); }));
+          if (i < lista.length - 1) acciones.appendChild(boton("↓ Bajar", function () { mover(lista, i, 1); repintar(seccion); cambio(); }));
+          acciones.appendChild(boton("Quitar", function () { lista.splice(i, 1); repintar(seccion); cambio(); }, "mini-btn peligro"));
+          cuerpo.appendChild(acciones);
+          item.appendChild(cuerpo);
+          caja.appendChild(item);
+        });
+        if (lista.length < MAX_VIDEOS) {
+          var form = formVideo(function (url) {
+            lista.push({ url: url, titulo: "" });
+            repintar(seccion);
+            cambio();
+          }, "Agregar");
+          caja.appendChild(form);
+        }
+        var firma = function (l) { return (l || []).map(function (v) { return String(v.url || "").trim() + "#" + limpio(v.titulo); }).join("|"); };
+        registrar({ seccion: seccion, caja: caja, cambiado: function () { return firma(lista) !== firma(original()); } });
+        return caja;
+      }
+
+      function campoMedios(def, s, seccion, original, grupo) {
+        var lista = s.medios;
+        var caja = crear("div", "campo");
+        caja.appendChild(crear("p", "campo-etiqueta", def.etiqueta));
+        var grilla = crear("div", "medios");
+        var nota = crear("p", "campo-nota");
+        var form = null;
+        lista.forEach(function (m, i) {
+          var tile = crear("figure", "medio" + (m.nueva ? " nuevo" : ""));
+          if (m.tipo === "video") {
+            tile.appendChild(miniaturaVideo(m.url));
+          } else {
+            var img = crear("img");
+            img.alt = "";
+            img.loading = "lazy";
+            img.src = srcFoto(m, true);
+            tile.appendChild(img);
+          }
+          if (i === 0) tile.appendChild(crear("span", "medio-principal", "Principal"));
+          var quitar = boton("×", function () { lista.splice(i, 1); repintar(seccion); cambio(); }, "medio-quitar");
+          quitar.setAttribute("aria-label", "Quitar " + (m.tipo === "video" ? "este video" : "esta foto"));
+          tile.appendChild(quitar);
+          if (i > 0) tile.appendChild(boton("Hacer principal", function () { lista.unshift(lista.splice(i, 1)[0]); repintar(seccion); cambio(); }, "medio-hacer-principal"));
+          grilla.appendChild(tile);
+        });
+        if (!lista.length) grilla.appendChild(crear("p", "vacio", "Todavía no tiene fotos ni videos."));
+        caja.appendChild(grilla);
+        if (lista.length < MAX_MEDIOS) {
+          var agregar = crear("div", "medios-agregar");
+          var masFoto = crear("label", "mini-btn agregar", "+ Agregar foto");
+          var entrada = crear("input");
+          entrada.type = "file";
+          entrada.accept = "image/*";
+          entrada.multiple = true;
+          entrada.addEventListener("change", function () {
+            agregarFotos(entrada.files, MAX_MEDIOS - lista.length, function (claves) {
+              claves.forEach(function (clave) { lista.push({ tipo: "foto", nueva: clave, alt: "" }); });
+              repintar(seccion);
+              cambio();
+            }, nota);
             entrada.value = "";
           });
-        });
-        quitar.addEventListener("click", function () { foto.reiniciar(); actualizar(); });
+          masFoto.appendChild(entrada);
+          agregar.appendChild(masFoto);
+          agregar.appendChild(boton("+ Agregar video", function () {
+            form.hidden = false;
+            form.entrada.focus();
+          }, "mini-btn agregar"));
+          caja.appendChild(agregar);
+          form = formVideo(function (url) {
+            lista.push({ tipo: "video", url: url });
+            repintar(seccion);
+            cambio();
+          }, "Agregar", function () { form.hidden = true; });
+          form.hidden = true;
+          caja.appendChild(form);
+        }
+        caja.appendChild(nota);
+        registrar({ seccion: seccion, grupo: grupo, caja: caja, cambiado: function () { return firmaMedios(lista) !== firmaMedios(original()); } });
         return caja;
       }
 
-      /* ¿Cambió la galería? Las fotos que ya estaban son los mismos objetos; las nuevas no. */
-      function galeriaCambio(g) {
-        return g.lista.length !== g.inicial.length || g.lista.some(function (f, i) { return f !== g.inicial[i]; });
-      }
-      function vistaFoto(f) { return f.nueva ? f.nueva.url : f.previa || urlSitio(f.src); }
-
-      /* Fotos del servicio (máximo 3): agregar, quitar y elegir la principal (la primera). */
-      function campoGaleria(s) {
-        var g = s.galeria;
-        g.inicial = g.lista.slice();
-        var caja = crear("div", "campo",
-          'Fotos <span class="nota-campo">(máximo ' + FOTOS_POR_SERVICIO + "; la primera es la principal)</span>" +
-          '<div class="galeria-editor"></div><p class="foto-estado"></p>');
-        var rejilla = $(".galeria-editor", caja);
-        var texto = $(".foto-estado", caja);
-        g.pintar = function () {
-          rejilla.textContent = "";
-          g.lista.forEach(function (f, i) {
-            var fig = crear("figure", "gal-foto" + (f.nueva ? " nueva" : ""), '<img alt="" /><div class="gal-acciones"></div>');
-            $("img", fig).src = vistaFoto(f);
-            if (i === 0) fig.insertAdjacentHTML("afterbegin", '<span class="gal-principal">Principal</span>');
-            var acciones = $(".gal-acciones", fig);
-            if (i > 0) {
-              var principal = crear("button", "", "Principal");
-              principal.type = "button";
-              principal.setAttribute("data-principal", "");
-              principal.addEventListener("click", function () { g.lista.unshift(g.lista.splice(i, 1)[0]); g.pintar(); actualizar(); });
-              acciones.appendChild(principal);
-            }
-            var quitar = crear("button", "", "Quitar");
-            quitar.type = "button";
-            quitar.setAttribute("data-quitar", "");
-            quitar.addEventListener("click", function () { g.lista.splice(i, 1); g.pintar(); actualizar(); });
-            acciones.appendChild(quitar);
-            rejilla.appendChild(fig);
-          });
-          if (g.lista.length < FOTOS_POR_SERVICIO) {
-            var agregar = crear("label", "gal-agregar", '+ Agregar foto<input type="file" accept="image/*" multiple hidden />');
-            var entrada = $("input", agregar);
-            entrada.addEventListener("change", function () {
-              var archivos = Array.prototype.slice.call(entrada.files || [], 0, FOTOS_POR_SERVICIO - g.lista.length);
-              if (!archivos.length) return;
-              texto.textContent = archivos.length === 1 ? "Preparando la foto…" : "Preparando las fotos…";
-              Promise.all(archivos.map(prepararFoto)).then(function (listas) {
-                listas.forEach(function (l) { if (g.lista.length < FOTOS_POR_SERVICIO) g.lista.push({ nueva: l }); });
-                texto.textContent = "";
-                g.pintar();
-                actualizar();
-              }).catch(function (error) {
-                texto.textContent = error.message;
-                entrada.value = "";
-              });
-            });
-            rejilla.appendChild(agregar);
+      function campoServicios(def, obj, k, seccion) {
+        var lista = obj[k];
+        var caja = crear("div", "servicios");
+        registrar({
+          seccion: seccion,
+          cambiado: function () {
+            return lista.map(claveServicio).join("|") !== base[seccion][k].map(function (s) { return s.id; }).join("|");
           }
-        };
-        g.reiniciar = function () {
-          g.lista = g.inicial.slice();
-          texto.textContent = "";
-          g.pintar();
-        };
-        g.pintar();
+        });
+        lista.forEach(function (s, i) { caja.appendChild(filaServicio(def, lista, s, i, seccion)); });
+        var agregar = boton("+ Agregar servicio", function () {
+          var nuevo = { id: "" };
+          def.campos.forEach(function (c) { nuevo[c] = c === "medios" ? [] : c === "precio" ? null : ""; });
+          lista.push(nuevo);
+          var clave = claveServicio(nuevo);
+          abiertos["srv:" + seccion + ":" + clave] = true;
+          enfocar = clave + ":nombre";
+          repintar(seccion);
+          cambio();
+        }, "mini-btn agregar");
+        agregar.disabled = lista.length >= MAX_SERVICIOS;
+        caja.appendChild(agregar);
         return caja;
       }
 
-      function pintar(modelo) {
-        var contenedor = $("[data-grupos]");
+      function filaServicio(def, lista, s, i, seccion) {
+        var anterior = servicioBase(seccion, s);
+        var clave = claveServicio(s);
+        var marca = "srv:" + seccion + ":" + clave;
+        var fila = crear("div", "servicio");
+        var cabeza = crear("div", "servicio-fila");
+
+        var foto = crear("button", "servicio-foto");
+        foto.type = "button";
+        foto.setAttribute("aria-hidden", "true");
+        foto.tabIndex = -1;
+        var principal = s.medios && s.medios[0];
+        if (principal && principal.tipo === "video") {
+          var info = analizarVideo(principal.url);
+          if (info && info.plataforma === "youtube") foto.style.backgroundImage = "url('https://i.ytimg.com/vi/" + info.id + "/default.jpg')";
+          else foto.textContent = "▶";
+        } else if (principal) {
+          var img = crear("img");
+          img.alt = "";
+          img.loading = "lazy";
+          img.src = srcFoto(principal, true);
+          foto.appendChild(img);
+        } else {
+          foto.textContent = "+";
+        }
+
+        var texto = crear("button", "servicio-texto");
+        texto.type = "button";
+        var nombre = crear("span", "servicio-titulo");
+        var sub = crear("span", "servicio-sub");
+        var editar = crear("span", "servicio-editar");
+        texto.appendChild(nombre);
+        texto.appendChild(sub);
+        texto.appendChild(editar);
+        cabeza.appendChild(foto);
+        cabeza.appendChild(texto);
+
+        var avisoFila = crear("p", "servicio-aviso");
+        if (def.campos.indexOf("precio") >= 0) cabeza.appendChild(campoPrecio(s, seccion, anterior, clave, avisoFila));
+        fila.appendChild(cabeza);
+        fila.appendChild(avisoFila);
+
+        var edicion = crear("div", "servicio-edicion");
+        var alternar = function (abrir) {
+          edicion.hidden = !abrir;
+          abiertos[marca] = abrir;
+          texto.setAttribute("aria-expanded", abrir ? "true" : "false");
+          editar.textContent = abrir ? "▴ Cerrar" : "✎ Editar";
+          if (abrir) $$("textarea", edicion).forEach(crecer);
+        };
+        texto.addEventListener("click", function () { alternar(edicion.hidden); });
+        foto.addEventListener("click", function () { alternar(edicion.hidden); });
+        fila.abrir = function () { alternar(true); };
+
+        def.campos.forEach(function (c) {
+          if (c === "precio") return;
+          var sub2 = camposServicio[c];
+          var original = function () { return anterior ? anterior[c] : undefined; };
+          if (c === "medios") edicion.appendChild(campoMedios(sub2, s, seccion, original, clave));
+          else edicion.appendChild(campoTexto(Object.assign({ k: c }, sub2), s, c, seccion, original, clave));
+        });
+        var acciones = crear("div", "servicio-acciones");
+        if (i > 0) acciones.appendChild(boton("↑ Subir", function () { mover(lista, i, -1); repintar(seccion); cambio(); }));
+        if (i < lista.length - 1) acciones.appendChild(boton("↓ Bajar", function () { mover(lista, i, 1); repintar(seccion); cambio(); }));
+        acciones.appendChild(boton("Eliminar", function () {
+          var n = limpio(s.nombre) || "este servicio";
+          if (!confirm("¿Eliminar «" + n + "» de la página?\n\nSi te equivocas, puedes tocar «Deshacer» antes de guardar.")) return;
+          lista.splice(i, 1);
+          repintar(seccion);
+          cambio();
+        }, "mini-btn peligro"));
+        edicion.appendChild(acciones);
+        fila.appendChild(edicion);
+        alternar(!!abiertos[marca]);
+
+        ganchos.push({ seccion: seccion, fn: function (_, grupos) {
+          var e = grupos[clave] || {};
+          fila.classList.toggle("cambiado", !!e.cambios && !e.errores);
+          fila.classList.toggle("invalido", !!e.errores);
+          nombre.textContent = limpio(s.nombre) || "Servicio nuevo";
+          sub.textContent = [s.id ? "" : "Nuevo", s.etiqueta, s.detalle, s.nota].map(function (t) { return limpio(t); }).filter(Boolean).join(" · ");
+        } });
+        return fila;
+      }
+
+      function campoPrecio(s, seccion, anterior, grupo, avisoFila) {
+        var caja = crear("label", "precio");
+        caja.appendChild(document.createTextNode("$"));
+        var input = crear("input");
+        input.inputMode = "numeric";
+        input.autocomplete = "off";
+        input.setAttribute("aria-label", "Precio");
+        input.setAttribute("data-enfocar", grupo + ":precio");
+        input.value = s.precio ? formatear(s.precio) : "";
+        input.placeholder = "0";
+        ajustar(input);
+        caja.appendChild(input);
+        var antes = anterior ? anterior.precio : null;
+        var c = registrar({
+          seccion: seccion,
+          grupo: grupo,
+          caja: caja,
+          cambiado: function () { return (s.precio || null) !== antes; },
+          error: function () { return s.precio >= 1000 && s.precio <= 50000000 ? "" : "Escribe el precio (solo números)"; },
+          alPintar: function (cambiado, error) {
+            var partes = [];
+            if (error) partes.push(error);
+            else if (cambiado && antes) {
+              partes.push("Antes: $" + formatear(antes));
+              if (s.precio % 1000 !== 0) partes.push("¿Seguro? No termina en 000");
+              else if (s.precio > antes * 1.5 || s.precio < antes * 0.5) partes.push("Cambio grande: revisa que esté bien");
+            } else if (s.precio && s.precio % 1000 !== 0) partes.push("Revisa este precio: no termina en 000");
+            avisoFila.textContent = partes.join(" · ");
+            avisoFila.classList.toggle("malo", !!error);
+          }
+        });
+        input.addEventListener("focus", function () { input.select(); });
+        input.addEventListener("input", function () {
+          var n = numero(input.value);
+          s.precio = n || null;
+          input.value = n ? formatear(n) : "";
+          ajustar(input);
+          cambio();
+        });
+        input.addEventListener("blur", function () { c.tocado = true; cambio(); });
+        input.addEventListener("keydown", function (e) { if (e.key === "Enter") input.blur(); });
+        return caja;
+      }
+
+      /* ---------- Secciones ---------- */
+      function pintarSeccion(sec) {
+        var clave = sec.clave;
+        var obj = datos[clave];
+        var original = function (k) { return function () { return base[clave][k]; }; };
+        var det = crear("details", "seccion");
+        det.setAttribute("data-seccion", clave);
+        det.open = !!abiertos["sec:" + clave];
+        det.addEventListener("toggle", function () {
+          abiertos["sec:" + clave] = det.open;
+          if (det.open) $$("textarea", det).forEach(crecer);
+        });
+        var resumen = crear("summary");
+        resumen.appendChild(crear("span", "sec-titulo", sec.titulo));
+        var info = crear("span", "sec-info");
+        var marcas = crear("span", "sec-marcas");
+        resumen.appendChild(info);
+        resumen.appendChild(marcas);
+        det.appendChild(resumen);
+        var cuerpo = crear("div", "sec-cuerpo");
+        det.appendChild(cuerpo);
+        if (sec.ayuda) cuerpo.appendChild(crear("p", "sec-ayuda", sec.ayuda));
+
+        // En las secciones con lista (servicios o videos), la lista va primero y los textos en un desplegable.
+        var conLista = sec.campos.some(function (d) { return d.tipo === "servicios" || d.tipo === "videos"; });
+        var secundarios = [];
+        sec.campos.forEach(function (def) {
+          if (conLista && def.tipo !== "interruptor" && def.tipo !== "servicios" && def.tipo !== "videos") { secundarios.push(def); return; }
+          cuerpo.appendChild(campo(def, obj, def.k, clave, original(def.k)));
+        });
+        if (secundarios.length) {
+          var sub = crear("details", "sub");
+          sub.open = !!abiertos["sub:" + clave];
+          sub.addEventListener("toggle", function () {
+            abiertos["sub:" + clave] = sub.open;
+            if (sub.open) $$("textarea", sub).forEach(crecer);
+          });
+          var conFoto = secundarios.some(function (d) { return d.tipo === "foto"; });
+          sub.appendChild(crear("summary", "", conFoto ? "Títulos, textos y foto de la sección" : "Títulos y textos de la sección"));
+          var subCuerpo = crear("div", "sub-cuerpo");
+          secundarios.forEach(function (def) { subCuerpo.appendChild(campo(def, obj, def.k, clave, original(def.k))); });
+          sub.appendChild(subCuerpo);
+          cuerpo.appendChild(sub);
+        }
+
+        var vistaAviso = null;
+        if (clave === "aviso") {
+          vistaAviso = crear("p", "vista-aviso");
+          cuerpo.appendChild(vistaAviso);
+        }
+        var google = null;
+        if (clave === "sitio") {
+          google = crear("div", "google");
+          google.appendChild(crear("p", "google-nota", "Así se ve más o menos en Google:"));
+          google.appendChild(crear("p", "google-url", "olivespamedellin.com"));
+          google.appendChild(crear("p", "google-titulo"));
+          google.appendChild(crear("p", "google-desc"));
+          cuerpo.appendChild(google);
+        }
+
+        var deshacer = boton("Deshacer los cambios de esta sección", function () {
+          datos[clave] = copia(base[clave]);
+          repintar(clave);
+          cambio();
+        }, "link deshacer-seccion");
+        cuerpo.appendChild(deshacer);
+
+        ganchos.push({ seccion: clave, fn: function (e) {
+          marcas.textContent = "";
+          var pastilla = function (texto, tipo) { marcas.appendChild(crear("span", "pastilla pastilla-" + tipo, texto)); };
+          if (clave === "aviso") pastilla(obj.visible && limpio(obj.texto) ? "Se muestra" : "Apagado", obj.visible && limpio(obj.texto) ? "activa" : "gris");
+          else if (obj.visible === false) pastilla("Oculta", "gris");
+          else if (clave === "videos" && !obj.lista.length) pastilla("Sin videos", "gris");
+          if (e.errores) pastilla("Revisar", "error");
+          else if (e.cambios) pastilla("Sin guardar", "cambios");
+          if (obj.servicios) info.textContent = obj.servicios.length === 1 ? "1 servicio" : obj.servicios.length + " servicios";
+          else if (clave === "videos" && obj.lista.length) info.textContent = obj.lista.length === 1 ? "1 video" : obj.lista.length + " videos";
+          deshacer.hidden = !e.cambios;
+          if (vistaAviso) {
+            vistaAviso.textContent = limpio(obj.texto) || "Escribe el texto del aviso";
+            vistaAviso.hidden = !obj.visible;
+          }
+          if (google) {
+            $(".google-titulo", google).textContent = limpio(obj.titulo);
+            $(".google-desc", google).textContent = limpio(obj.descripcion);
+          }
+        } });
+        return det;
+      }
+
+      function pintarTodo() {
+        controles = [];
+        ganchos = [];
         contenedor.textContent = "";
-        servicios = modelo.servicios;
-        fotosPagina = modelo.fotos;
-        var bloques = {};
-        function bloque(titulo) {
-          if (!bloques[titulo]) {
-            var b = crear("section", "card grupo");
-            var h = crear("h2");
-            h.textContent = titulo;
-            b.appendChild(h);
-            contenedor.appendChild(b);
-            bloques[titulo] = b;
-          }
-          return bloques[titulo];
-        }
+        esquema.forEach(function (sec) { contenedor.appendChild(pintarSeccion(sec)); });
+        $$("textarea", contenedor).forEach(crecer);
+        aplicarEnfoque();
+      }
+      function repintar(clave) {
+        var viejo = $('[data-seccion="' + clave + '"]', contenedor);
+        controles = controles.filter(function (c) { return c.seccion !== clave; });
+        ganchos = ganchos.filter(function (g) { return g.seccion !== clave; });
+        var nuevo = pintarSeccion(seccionDe(clave));
+        viejo.parentNode.replaceChild(nuevo, viejo);
+        $$("textarea", nuevo).forEach(crecer);
+        aplicarEnfoque();
+      }
+      function aplicarEnfoque() {
+        if (!enfocar) return;
+        var el = $('[data-enfocar="' + enfocar + '"]', contenedor);
+        enfocar = null;
+        if (!el) return;
+        el.focus({ preventScroll: true });
+        el.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+      function irAlPrimerError() {
+        $$(".servicio.invalido", contenedor).forEach(function (f) { if (f.abrir) f.abrir(); });
+        var primero = $(".invalido", contenedor);
+        if (!primero) return;
+        for (var el = primero; el && el !== contenedor; el = el.parentElement) if (el.tagName === "DETAILS") el.open = true;
+        setTimeout(function () {
+          primero.scrollIntoView({ block: "center", behavior: "smooth" });
+          var entrada = primero.matches("input, textarea") ? primero : $("input, textarea", primero);
+          if (entrada) entrada.focus({ preventScroll: true });
+        }, 60);
+      }
 
-        servicios.forEach(function (s) {
-          var fila = crear("div", "fila",
-            '<div class="fila-principal">' +
-              '<div class="fila-texto"><span class="fila-nombre"></span><span class="fila-detalle"></span></div>' +
-            "</div>" +
-            '<button class="editar" type="button" aria-expanded="false"></button>' +
-            '<div class="edicion" hidden></div>');
-          var principal = $(".fila-principal", fila);
-          var edicion = $(".edicion", fila);
-          var boton = $(".editar", fila);
-          s.fila = fila;
-          s.titulo = $(".fila-nombre", fila);
-          s.subtitulo = $(".fila-detalle", fila);
-
-          if (s.precio) {
-            var etiqueta = crear("label", "precio", "$<input inputmode=\"numeric\" autocomplete=\"off\" enterkeyhint=\"done\" />");
-            var entrada = $("input", etiqueta);
-            entrada.value = formatear(s.precio.base);
-            ajustar(entrada);
-            entrada.addEventListener("focus", function () { entrada.select(); });
-            entrada.addEventListener("input", function () {
-              var n = numero(entrada.value);
-              entrada.value = n ? formatear(n) : "";
-              ajustar(entrada);
-              actualizar();
-            });
-            entrada.addEventListener("keydown", function (e) { if (e.key === "Enter") entrada.blur(); });
-            principal.appendChild(etiqueta);
-            if (s.precio.nota) { var nota = crear("span", "precio-nota"); nota.textContent = s.precio.nota; principal.appendChild(nota); }
-            s.precio.input = entrada;
-            s.precio.caja = etiqueta;
-          }
-          s.aviso = crear("span", "fila-aviso");
-          principal.appendChild(s.aviso);
-
-          ORDEN_CAMPOS.forEach(function (campo) {
-            var info = s.campos[campo];
-            if (!info) return;
-            var multilinea = campo === "descripcion";
-            var caja = crear("label", "campo");
-            caja.appendChild(document.createTextNode(ETIQUETAS[campo]));
-            var control = document.createElement(multilinea ? "textarea" : "input");
-            control.maxLength = multilinea ? 700 : 90;
-            if (multilinea) { control.rows = 3; control.placeholder = "Escribe aquí la descripción (opcional)"; }
-            control.value = info.base;
-            control.addEventListener("input", function () { crecer(control); actualizar(); });
-            caja.appendChild(control);
-            edicion.appendChild(caja);
-            info.input = control;
-            info.caja = caja;
-          });
-          if (s.foto) {
-            var cajaFoto = crear("div", "campo");
-            cajaFoto.appendChild(document.createTextNode("Foto"));
-            cajaFoto.appendChild(campoFoto(s.foto));
-            edicion.appendChild(cajaFoto);
-          }
-          if (s.galeria) edicion.appendChild(campoGaleria(s));
-
-          var partes = ["nombre"];
-          if (s.campos.descripcion) partes.push("descripción");
-          if (s.galeria) partes.push("fotos");
-          else if (s.foto) partes.push("foto");
-          var texto = "Editar " + (partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : partes[0]);
-          boton.textContent = texto;
-          boton.addEventListener("click", function () {
-            var abrir = edicion.hidden;
-            edicion.hidden = !abrir;
-            boton.setAttribute("aria-expanded", abrir ? "true" : "false");
-            boton.textContent = abrir ? "Cerrar" : texto;
-            if (abrir && s.campos.descripcion) {
-              crecer(s.campos.descripcion.input);
-              if (!s.campos.descripcion.input.value) s.campos.descripcion.input.focus();
+      /* ---------- Borrador: si el navegador se cierra, los cambios se pueden recuperar ---------- */
+      function sinFotosNuevas(d) {
+        var c = copia(d);
+        esquema.forEach(function (sec) {
+          var s = c[sec.clave];
+          if (!s || typeof s !== "object") return;
+          sec.campos.forEach(function (def) {
+            if (def.tipo === "foto" && (!s[def.k] || s[def.k].nueva)) s[def.k] = copia(base[sec.clave][def.k]);
+            if (LISTAS.indexOf(def.tipo) >= 0 && !Array.isArray(s[def.k])) s[def.k] = copia(base[sec.clave][def.k]);
+            if (def.tipo === "servicios") {
+              s[def.k] = s[def.k].filter(function (srv) { return srv && typeof srv === "object"; });
+              s[def.k].forEach(function (srv) {
+                srv.medios = (Array.isArray(srv.medios) ? srv.medios : []).filter(function (m) { return m && !m.nueva; });
+              });
             }
           });
-          bloque(s.grupo).appendChild(fila);
         });
-
-        if (fotosPagina.length) {
-          var grupoFotos = bloque("Fotos de la página");
-          fotosPagina.forEach(function (f) {
-            var fila = crear("div", "fila foto-fila", '<span class="fila-nombre"></span>');
-            $(".fila-nombre", fila).textContent = f.etiqueta || f.id;
-            fila.appendChild(campoFoto(f));
-            f.fila = fila;
-            grupoFotos.appendChild(fila);
-          });
-        }
+        return c;
+      }
+      function guardarBorrador() {
+        if (!datos || !base) return;
+        if (!hayCambios) { borrarBorrador(); return; }
+        try {
+          localStorage.setItem(BORRADOR, JSON.stringify({ version: base.version, fecha: Date.now(), datos: sinFotosNuevas(datos) }));
+        } catch (_) { /* sin espacio o en modo privado: no pasa nada */ }
+      }
+      function borrarBorrador() {
+        clearTimeout(tBorrador);
+        try { localStorage.removeItem(BORRADOR); } catch (_) {}
+      }
+      function recuperarBorrador() {
+        var b = null;
+        try { b = JSON.parse(localStorage.getItem(BORRADOR) || "null"); } catch (_) {}
+        if (!b || !b.datos || typeof b.datos !== "object") return;
+        if (b.version !== base.version) { borrarBorrador(); return; }
+        var fecha = "";
+        try { fecha = new Date(b.fecha).toLocaleString("es-CO", { day: "numeric", month: "long", hour: "numeric", minute: "2-digit" }); } catch (_) {}
+        if (!confirm("Encontré cambios que no alcanzaste a guardar" + (fecha ? " (" + fecha + ")" : "") + ".\n\n¿Quieres recuperarlos?")) { borrarBorrador(); return; }
+        var limpioBorrador = sinFotosNuevas(Object.keys(base).reduce(function (o, k) {
+          o[k] = b.datos[k] && typeof b.datos[k] === "object" ? b.datos[k] : base[k];
+          return o;
+        }, {}));
+        limpioBorrador.version = base.version;
+        datos = limpioBorrador;
       }
 
-      /* Lista de cambios sin guardar, con lo que había antes y lo nuevo. */
-      function pendientes() {
-        var lista = [];
-        servicios.forEach(function (s) {
-          if (s.precio) {
-            var n = numero(s.precio.input.value);
-            if (n !== s.precio.base) lista.push({ tipo: "precio", s: s, antes: s.precio.base, despues: n });
-          }
-          ORDEN_CAMPOS.forEach(function (campo) {
-            var info = s.campos[campo];
-            if (!info) return;
-            var valor = normalizar(info.input.value, campo);
-            if (valor !== info.base) lista.push({ tipo: "texto", s: s, campo: campo, antes: info.base, despues: valor });
-          });
-          if (s.foto && s.foto.pendiente) lista.push({ tipo: "foto", s: s, foto: s.foto });
-          if (s.galeria && galeriaCambio(s.galeria)) lista.push({ tipo: "galeria", s: s });
-        });
-        fotosPagina.forEach(function (f) { if (f.pendiente) lista.push({ tipo: "foto", foto: f }); });
-        return lista;
-      }
-
-      function avisoPrecio(n, antes) {
-        if (n % 1000 !== 0) return "¿Seguro? No termina en 000";
-        if (antes && (n > antes * 1.5 || n < antes * 0.5)) return "Cambio grande: revisa que esté bien";
-        return "";
-      }
-
-      function actualizar() {
-        var malos = 0;
-        servicios.forEach(function (s) {
-          var cambiado = false;
-          var invalido = false;
-          var mensajes = [];
-          if (s.precio) {
-            var n = numero(s.precio.input.value);
-            var precioCambio = n !== s.precio.base;
-            s.precio.caja.classList.toggle("modificado", precioCambio);
-            if (n < MINIMO) { invalido = true; mensajes.push("Escribe un precio válido"); }
-            else if (precioCambio) {
-              cambiado = true;
-              mensajes.push("Antes: $" + formatear(s.precio.base));
-              var extra = avisoPrecio(n, s.precio.base);
-              if (extra) mensajes.push(extra);
-            } else if (n % 1000 !== 0) mensajes.push("Revisa este precio: no termina en 000");
-          }
-          ORDEN_CAMPOS.forEach(function (campo) {
-            var info = s.campos[campo];
-            if (!info) return;
-            var valor = normalizar(info.input.value, campo);
-            var distinto = valor !== info.base;
-            var vacio = campo === "nombre" && !valor;
-            info.caja.classList.toggle("modificado", distinto && !vacio);
-            info.caja.classList.toggle("invalido", vacio);
-            if (vacio) { invalido = true; mensajes.push("El nombre no puede quedar vacío"); }
-            else if (distinto) cambiado = true;
-          });
-          if (s.foto && s.foto.pendiente) { cambiado = true; mensajes.push("Foto nueva"); }
-          if (s.galeria && galeriaCambio(s.galeria)) { cambiado = true; mensajes.push("Fotos cambiadas"); }
-          if (invalido) malos++;
-          s.titulo.textContent = nombreActual(s);
-          s.subtitulo.textContent = s.campos.detalle ? normalizar(s.campos.detalle.input.value, "detalle") : "";
-          s.fila.classList.toggle("cambiado", cambiado && !invalido);
-          s.fila.classList.toggle("invalido", invalido);
-          s.aviso.textContent = mensajes.join(" · ");
-        });
-        fotosPagina.forEach(function (f) { f.fila.classList.toggle("cambiado", !!f.pendiente); });
-
-        var lista = pendientes();
-        $("[data-guardar]").disabled = !lista.length || malos > 0;
-        $("[data-deshacer]").hidden = !lista.length;
-        if (malos) estado("Revisa lo marcado en rojo", "error");
-        else if (lista.length) estado(lista.length === 1 ? "1 cambio sin guardar" : lista.length + " cambios sin guardar");
-        else estado("Sin cambios");
-      }
-
+      /* ---------- Cargar, entrar y salir ---------- */
       function cargar() {
-        if (servicios.length) { mostrar("editor"); actualizar(); return; }
+        if (datos) { mostrar("editor"); refrescar(); return; }
         mostrar("cargando");
         api("GET").then(function (r) {
-          if (r.estado === 200 && r.cuerpo.html) {
-            pintar(leerModelo(r.cuerpo.html));
+          if (r.estado === 200 && r.cuerpo.contenido) {
+            esquema = r.cuerpo.esquema;
+            camposServicio = r.cuerpo.camposServicio;
+            base = r.cuerpo.contenido;
+            datos = copia(base);
+            recuperarBorrador();
+            try {
+              pintarTodo();
+            } catch (error) {
+              // Un borrador dañado no debe impedir usar el panel.
+              console.warn(error);
+              borrarBorrador();
+              datos = copia(base);
+              pintarTodo();
+            }
             mostrar("editor");
-            actualizar();
+            refrescar();
           } else if (r.estado === 401) {
             pedirLogin("");
           } else {
-            aviso(r.cuerpo.error || "No se pudo abrir el panel. Recarga la página.");
+            avisoCarga(r.cuerpo.error || "No se pudo abrir el panel. Recarga la página.");
           }
         }).catch(function () {
-          aviso("No hay conexión con el panel. Revisa el internet y recarga la página.");
+          avisoCarga("No hay conexión con el panel. Revisa el internet y recarga la página.");
         });
       }
 
@@ -797,9 +1659,9 @@
         var clave = login.clave.value;
         var error = $("[data-error-login]");
         if (!usuario || !clave) { error.textContent = "Escribe tu usuario y tu contraseña."; return; }
-        var boton = $("[data-entrar]");
-        boton.disabled = true;
-        boton.textContent = "Entrando…";
+        var b = $("[data-entrar]");
+        b.disabled = true;
+        b.textContent = "Entrando…";
         error.textContent = "";
         api("POST", "entrar", { usuario: usuario, clave: clave }).then(function (r) {
           if (r.estado === 200) { login.clave.value = ""; cargar(); }
@@ -807,8 +1669,8 @@
         }).catch(function () {
           error.textContent = "No hay conexión. Revisa el internet e intenta de nuevo.";
         }).then(function () {
-          boton.disabled = false;
-          boton.textContent = "Entrar";
+          b.disabled = false;
+          b.textContent = "Entrar";
         });
       });
 
@@ -819,190 +1681,197 @@
         this.setAttribute("aria-label", visible ? "Mostrar contraseña" : "Ocultar contraseña");
       });
 
-      $("[data-deshacer]").addEventListener("click", function () {
-        servicios.forEach(function (s) {
-          if (s.precio) { s.precio.input.value = formatear(s.precio.base); ajustar(s.precio.input); }
-          ORDEN_CAMPOS.forEach(function (campo) {
-            if (!s.campos[campo]) return;
-            s.campos[campo].input.value = s.campos[campo].base;
-            crecer(s.campos[campo].input);
-          });
-          if (s.foto) s.foto.reiniciar();
-          if (s.galeria) s.galeria.reiniciar();
-        });
-        fotosPagina.forEach(function (f) { f.reiniciar(); });
-        actualizar();
-      });
-
-      /* Arma la ventana de confirmación con cada cambio (y avisos de precios raros). */
-      $("[data-guardar]").addEventListener("click", function () {
-        var lista = pendientes();
-        if (!lista.length) return;
-        var resumen = $("[data-resumen]");
-        resumen.textContent = "";
-        var porElemento = {}; // un solo recuadro por servicio o foto, con todos sus cambios
-        lista.forEach(function (c) {
-          var clave = c.s ? "s:" + c.s.id : "f:" + c.foto.id;
-          var li = porElemento[clave];
-          if (!li) {
-            li = porElemento[clave] = crear("li", "", '<span class="r-titulo"></span>');
-            $(".r-titulo", li).textContent = c.s ? nombreActual(c.s) : (c.foto.etiqueta || c.foto.id);
-            resumen.appendChild(li);
-          }
-          var detalle = crear("span", "r-detalle");
-          li.appendChild(detalle);
-          if (c.tipo === "precio") {
-            detalle.innerHTML = "Precio: <s></s> → <strong></strong>";
-            $("s", detalle).textContent = "$" + formatear(c.antes);
-            $("strong", detalle).textContent = "$" + formatear(c.despues);
-            var extra = avisoPrecio(c.despues, c.antes);
-            if (extra) { var av = crear("span", "r-aviso"); av.textContent = "⚠ " + extra; li.appendChild(av); }
-          } else if (c.tipo === "texto") {
-            var etiqueta = ETIQUETAS[c.campo];
-            detalle.textContent = !c.despues ? etiqueta + ": se borra" : etiqueta + (c.antes ? ": «" : " (nueva): «") + resumir(c.despues, 90) + "»";
-          } else if (c.tipo === "galeria") {
-            var fotosG = c.s.galeria.lista;
-            var nuevasG = fotosG.filter(function (f) { return f.nueva; }).length;
-            detalle.textContent = !fotosG.length ? "Fotos: se quitan todas" :
-              "Fotos: " + fotosG.length + (nuevasG ? " (" + nuevasG + (nuevasG === 1 ? " nueva)" : " nuevas)") : "");
-            var filaFotos = crear("div", "r-fotos");
-            fotosG.forEach(function (f) {
-              var miniG = crear("img");
-              miniG.alt = "";
-              miniG.src = vistaFoto(f);
-              filaFotos.appendChild(miniG);
-            });
-            li.appendChild(filaFotos);
-          } else {
-            detalle.textContent = "Foto nueva";
-            var mini = crear("img");
-            mini.alt = "";
-            mini.src = c.foto.pendiente.url;
-            li.appendChild(mini);
-          }
-        });
-        dialogo.showModal();
-      });
-
-      $("[data-cancelar]").addEventListener("click", function () { dialogo.close(); });
-
-      $("[data-publicar]").addEventListener("click", function () {
-        var lista = pendientes();
-        var pedido = { precios: {}, textos: {}, fotos: {}, galerias: {} };
-        lista.forEach(function (c) {
-          if (c.tipo === "precio") pedido.precios[c.s.id] = c.despues;
-          else if (c.tipo === "texto") pedido.textos[c.s.id + ":" + c.campo] = c.despues;
-          else if (c.tipo === "foto") pedido.fotos[c.foto.id] = { datos: c.foto.pendiente.datos, alt: c.s ? nombreActual(c.s) : ALT_GENERAL };
-        });
-        // Las fotos se envían si cambiaron, o si cambió el nombre (para actualizar su texto alternativo).
-        servicios.forEach(function (s) {
-          if (!s.galeria) return;
-          var nombreCambio = s.campos.nombre && normalizar(s.campos.nombre.input.value, "nombre") !== s.campos.nombre.base;
-          if (!galeriaCambio(s.galeria) && !(nombreCambio && s.galeria.lista.length)) return;
-          pedido.galerias[s.id] = {
-            alt: nombreActual(s),
-            fotos: s.galeria.lista.map(function (f) { return f.nueva ? { datos: f.nueva.datos, mini: f.nueva.mini } : { grande: f.grande }; })
-          };
-        });
-        var envio = JSON.stringify(pedido);
-        if (envio.length > ENVIO_MAX) {
-          dialogo.close();
-          estado("Son muchas fotos a la vez. Publica primero algunas y luego el resto.", "error");
-          return;
-        }
-        var boton = this;
-        boton.disabled = true;
-        boton.textContent = "Publicando…";
-        api("POST", "guardar", pedido).then(function (r) {
-          dialogo.close();
-          if (r.estado === 401) {
-            pedirLogin("Tu sesión terminó. Entra de nuevo y vuelve a tocar Guardar: tus cambios siguen ahí.");
-            return;
-          }
-          if (r.estado !== 200) { estado(r.cuerpo.error || "No se pudo guardar. Intenta de nuevo.", "error"); return; }
-          var rutas = r.cuerpo.fotos || {};
-          var galeriasFinales = r.cuerpo.galerias || {};
-          lista.forEach(function (c) {
-            if (c.tipo === "precio") c.s.precio.base = c.despues;
-            else if (c.tipo === "texto") c.s.campos[c.campo].base = c.despues;
-            else if (c.tipo === "foto" && rutas[c.foto.id]) {
-              c.foto.src = rutas[c.foto.id];
-              c.foto.previa = c.foto.pendiente.url; // la foto nueva tarda en estar en la página
-              c.foto.reiniciar();
-            }
-          });
-          Object.keys(galeriasFinales).forEach(function (id) {
-            var s = servicios.filter(function (x) { return x.id === id; })[0];
-            if (!s || !s.galeria) return;
-            // Se sigue mostrando la vista previa de las fotos nuevas mientras Vercel publica.
-            s.galeria.lista = galeriasFinales[id].map(function (f, i) {
-              var antes = s.galeria.lista[i];
-              return { grande: f.grande, src: f.src, previa: antes && antes.nueva ? antes.nueva.url : antes && antes.previa };
-            });
-            s.galeria.inicial = s.galeria.lista.slice();
-            s.galeria.pintar();
-          });
-          actualizar();
-          estado("Guardado ✓ Publicando en la página…", "ok");
-          verificarPublicacion(pedido, rutas, galeriasFinales);
-        }).catch(function () {
-          dialogo.close();
-          estado("No hay conexión. Revisa el internet e intenta de nuevo.", "error");
-        }).then(function () {
-          boton.disabled = false;
-          boton.textContent = "Sí, publicar";
-        });
-      });
-
-      /* Revisa la página pública hasta que muestre todo lo guardado. */
-      function verificarPublicacion(pedido, rutas, galerias) {
-        var mia = ++ronda;
-        var inicio = Date.now();
-        var avisar = function (texto) { if (mia === ronda && !pendientes().length) estado(texto, "ok"); };
-        var seguir = function () {
-          if (mia !== ronda) return;
-          if (Date.now() - inicio > 4 * 60 * 1000) { avisar("Guardado ✓ Puede tardar unos minutos más en verse en la página."); return; }
-          setTimeout(revisar, 8000);
-        };
-        var revisar = function () {
-          fetch("/?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (html) {
-            var vivo = leerModelo(html);
-            var porId = {};
-            vivo.servicios.forEach(function (s) { porId[s.id] = s; });
-            var fotosVivas = {};
-            vivo.fotos.forEach(function (f) { fotosVivas[f.id] = f.src; });
-            vivo.servicios.forEach(function (s) { if (s.foto) fotosVivas[s.id] = s.foto.src; });
-            var listo = Object.keys(pedido.precios).every(function (id) {
-              return porId[id] && porId[id].precio && porId[id].precio.base === pedido.precios[id];
-            }) && Object.keys(pedido.textos).every(function (clave) {
-              var partes = clave.split(":");
-              var s = porId[partes[0]];
-              return s && s.campos[partes[1]] && s.campos[partes[1]].base === pedido.textos[clave];
-            }) && Object.keys(rutas).every(function (id) { return fotosVivas[id] === rutas[id]; })
-              && Object.keys(galerias).every(function (id) {
-                var viva = porId[id] && porId[id].galeria;
-                return viva && viva.base.join("|") === galerias[id].map(function (f) { return f.grande; }).join("|");
-              });
-            if (listo) avisar("Publicado ✓ Los cambios ya están en la página.");
-            else seguir();
-          }).catch(seguir);
-        };
-        setTimeout(revisar, 5000);
-      }
-
       $("[data-salir]").addEventListener("click", function () {
-        if (pendientes().length && !confirm("Tienes cambios sin guardar. ¿Salir de todas formas?")) return;
+        if (hayCambios && !confirm("Tienes cambios sin guardar. ¿Salir de todas formas?")) return;
         api("POST", "salir", {}).catch(function () {}).then(function () {
-          servicios = [];
-          fotosPagina = [];
+          base = datos = null;
+          fotos = {};
+          hayCambios = false;
+          intento = false;
           ronda++;
-          $("[data-grupos]").textContent = "";
+          reposo = { texto: "Sin cambios", tipo: "" };
+          borrarBorrador();
+          controles = [];
+          ganchos = [];
+          contenedor.textContent = "";
           pedirLogin("");
         });
       });
 
+      /* ---------- Deshacer, guardar y publicar ---------- */
+      $("[data-deshacer]").addEventListener("click", function () {
+        if (!confirm("¿Descartar todos los cambios sin guardar?")) return;
+        datos = copia(base);
+        fotos = {};
+        intento = false;
+        borrarBorrador();
+        pintarTodo();
+        refrescar();
+      });
+
+      function clavesNuevas(contenido) {
+        var claves = [];
+        var visitar = function (v) {
+          if (Array.isArray(v)) v.forEach(visitar);
+          else if (v && typeof v === "object") {
+            if (v.nueva && claves.indexOf(v.nueva) < 0) claves.push(v.nueva);
+            Object.keys(v).forEach(function (k) { visitar(v[k]); });
+          }
+        };
+        visitar(contenido);
+        return claves;
+      }
+
+      function advertencias() {
+        var lista = [];
+        seccionesServicios().forEach(function (clave) {
+          datos[clave].servicios.forEach(function (s) {
+            var anterior = servicioBase(clave, s);
+            var antes = anterior ? anterior.precio : null;
+            if (!s.precio || s.precio === antes) return;
+            var nombre = "«" + limpio(s.nombre) + "»";
+            if (s.precio % 1000 !== 0) lista.push(nombre + ": $" + formatear(s.precio) + " no termina en 000. ¿Está bien?");
+            else if (antes && (s.precio > antes * 1.5 || s.precio < antes * 0.5)) {
+              lista.push(nombre + ": cambio grande de precio ($" + formatear(antes) + " → $" + formatear(s.precio) + "). ¿Está bien?");
+            }
+          });
+        });
+        return lista;
+      }
+
+      function pintarResumen(lineas, avisos) {
+        var ul = $("[data-resumen]");
+        ul.textContent = "";
+        lineas.forEach(function (l) {
+          var li = crear("li");
+          var i = l.indexOf(": ");
+          if (i > 0) {
+            li.appendChild(crear("strong", "", l.slice(0, i)));
+            li.appendChild(document.createTextNode(" · " + l.slice(i + 2)));
+          } else {
+            li.textContent = l;
+          }
+          ul.appendChild(li);
+        });
+        var ua = $("[data-advertencias]");
+        ua.textContent = "";
+        ua.hidden = !avisos.length;
+        avisos.forEach(function (a) { ua.appendChild(crear("li", "", a)); });
+      }
+
+      $("[data-guardar]").addEventListener("click", function () {
+        intento = true;
+        if (refrescar().errores) { irAlPrimerError(); return; }
+        var contenido = copia(datos);
+        var nuevas = clavesNuevas(contenido);
+        if (nuevas.length > FOTOS_POR_GUARDADO) {
+          estado("Son " + nuevas.length + " fotos nuevas. Guarda máximo " + FOTOS_POR_GUARDADO + " a la vez: quita algunas, guarda, y agrégalas después.", "error");
+          return;
+        }
+        var b = this;
+        b.disabled = true;
+        estado("Revisando los cambios…");
+        api("POST", "revisar", { version_base: base.version, contenido: contenido, nuevas: nuevas }).then(function (r) {
+          if (r.estado === 401) { pedirLogin("Tu sesión terminó. Entra de nuevo y vuelve a tocar «Guardar y publicar»: tus cambios siguen aquí."); return; }
+          if (r.estado !== 200) { estado(r.cuerpo.error || "No se pudo revisar. Intenta de nuevo.", "error"); return; }
+          var lineas = r.cuerpo.cambios || [];
+          if (!lineas.length) { estado("No hay cambios para publicar."); return; }
+          pendiente = { contenido: contenido, nuevas: nuevas };
+          pintarResumen(lineas, advertencias());
+          dialogo.showModal();
+          refrescar();
+        }).catch(function () {
+          estado("No hay conexión. Revisa el internet e intenta de nuevo.", "error");
+        }).then(function () {
+          b.disabled = !hayCambios;
+        });
+      });
+
+      $("[data-cancelar]").addEventListener("click", function () { dialogo.close(); });
+      dialogo.addEventListener("cancel", function (e) { if (publicando) e.preventDefault(); });
+      dialogo.addEventListener("close", function () { if (!publicando) pendiente = null; });
+
+      $("[data-publicar]").addEventListener("click", function () {
+        if (!pendiente || publicando) return;
+        var archivos = {};
+        pendiente.nuevas.forEach(function (k) { archivos[k] = { datos: fotos[k].datos, mini: fotos[k].mini }; });
+        var cuerpo = JSON.stringify({ version_base: base.version, contenido: pendiente.contenido, archivos: archivos });
+        if (cuerpo.length > ENVIO_MAX) {
+          dialogo.close();
+          estado("Las fotos nuevas pesan mucho para un solo guardado. Quita algunas, guarda, y agrégalas en otro guardado.", "error");
+          return;
+        }
+        var b = this;
+        var cancelar = $("[data-cancelar]");
+        publicando = true;
+        b.disabled = cancelar.disabled = true;
+        b.textContent = "Publicando…";
+        var terminar = function () {
+          publicando = false;
+          b.disabled = cancelar.disabled = false;
+          b.textContent = "Sí, publicar";
+          dialogo.close();
+        };
+        api("POST", "guardar", cuerpo).then(function (r) {
+          terminar();
+          if (r.estado === 401) { pedirLogin("Tu sesión terminó. Entra de nuevo y vuelve a tocar «Guardar y publicar»: tus cambios siguen aquí."); return; }
+          if (r.estado !== 200) { estado(r.cuerpo.error || "No se pudo guardar. Intenta de nuevo.", "error"); return; }
+          publicado(r.cuerpo);
+        }).catch(function () {
+          terminar();
+          estado("No hay conexión. Revisa el internet e intenta de nuevo. Tus cambios siguen aquí.", "error");
+        });
+      });
+
+      function publicado(res) {
+        // Las fotos nuevas tardan en estar en la página: mientras tanto se muestran desde este celular.
+        Object.keys(res.fotos || {}).forEach(function (k) {
+          var f = fotos[k];
+          var r = res.fotos[k];
+          if (!f || !r) return;
+          previas[r.grande] = f.url;
+          if (r.mini) previas[r.mini] = f.url;
+        });
+        base = res.contenido;
+        datos = copia(base);
+        fotos = {};
+        intento = false;
+        borrarBorrador();
+        pintarTodo();
+        if (res.cambios) {
+          reposo = { texto: "Guardado ✓ Publicando en la página…", tipo: "ok" };
+          verificar(res.version);
+        } else {
+          reposo = { texto: "No había cambios para publicar.", tipo: "" };
+        }
+        refrescar();
+      }
+
+      /* Revisa la página pública hasta que tenga la versión guardada. */
+      function verificar(version) {
+        var mia = ++ronda;
+        var inicio = Date.now();
+        var listo = function (texto) {
+          if (mia !== ronda) return;
+          reposo = { texto: texto, tipo: "ok" };
+          if (!hayCambios) estado(texto, "ok");
+        };
+        var seguir = function () {
+          if (mia !== ronda) return;
+          if (Date.now() - inicio > 4 * 60 * 1000) { listo("Guardado ✓ Puede tardar unos minutos más en verse en la página."); return; }
+          setTimeout(revisarPagina, 8000);
+        };
+        var revisarPagina = function () {
+          fetch("/contenido.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (c) {
+            if (c && c.version >= version) listo("Publicado ✓ Los cambios ya están en la página.");
+            else seguir();
+          }).catch(seguir);
+        };
+        setTimeout(revisarPagina, 5000);
+      }
+
       window.addEventListener("beforeunload", function (e) {
-        if (pendientes().length) { e.preventDefault(); e.returnValue = ""; }
+        if (hayCambios) { e.preventDefault(); e.returnValue = ""; }
       });
 
       cargar();
