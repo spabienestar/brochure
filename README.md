@@ -34,7 +34,7 @@ Las fotografías provienen de repositorios gratuitos bajo licencias Creative Com
 
 Todo lo que se ve en la página vive en `contenido.json`, y `index.html` se genera a partir de él con `api/_sitio.js`. Así la dueña puede cambiar cualquier parte desde el panel sin tocar código:
 
-- **Cambios de contenido** (precios, textos, servicios, fotos, videos, contacto): desde el panel `/tarifas`, o editando `contenido.json` y corriendo `node herramientas/generar.js`.
+- **Cambios de contenido** (precios, textos, servicios, fotos, videos, contacto): desde el panel `/tarifas`, o editando `contenido.json` y corriendo `node herramientas/generar.js`. Si lo editas a mano, súbele 1 a `version`: así, si la dueña tiene el panel abierto, el panel le pide recargar en vez de pisar tu cambio.
 - **Cambios de diseño** (estructura del HTML): en la función `renderizar` de `api/_sitio.js`. Después corre `node herramientas/generar.js` y sube `index.html` junto con el cambio.
 - **Estilos e interacciones**: en `styles.css` y `main.js`. Si cambian, sube `VERSION_ARCHIVOS` en `api/_sitio.js` (para que los navegadores no usen la copia vieja) y regenera `index.html`.
 - **Agregar un campo editable**: decláralo en `ESQUEMA` (o en `CAMPOS_SERVICIO`) de `api/_sitio.js`, agrégalo a `contenido.json` y úsalo en `renderizar`. El panel arma sus formularios a partir del esquema, no hay que tocarlo.

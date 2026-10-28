@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "aviso": {
     "visible": false,
     "texto": ""
@@ -558,10 +558,10 @@
     }
   },
   "contacto": {
-    "whatsapp": "573232885910",
-    "whatsapp_2": "573001054987",
+    "whatsapp": "573001054987",
+    "whatsapp_2": "",
     "mensaje": "Hola, Olivé Spa 🌿 Quiero reservar una experiencia de spa a domicilio.",
-    "email": "bienestarencasa2013@gmail.com",
+    "email": "olivespamedellin@gmail.com",
     "horarios": [
       {
         "dias": "Lunes a sábado",
@@ -574,7 +574,7 @@
         "horas": "10:00 a.m. – 4:00 p.m."
       }
     ],
-    "instagram": "https://www.instagram.com/spamedellin_oficial",
+    "instagram": "https://www.instagram.com/olivespamedellin/",
     "facebook": "https://www.facebook.com/share/18Qb4jLNsf/",
     "tiktok": "https://www.tiktok.com/@spamedellinoficial",
     "cobertura": [
