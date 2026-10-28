@@ -219,6 +219,7 @@ ul, ol { list-style: none; padding: 0; }
   color: var(--ink-soft);
   position: relative;
   padding-block: 0.3rem;
+  white-space: nowrap;
 }
 .nav-links a::after {
   content: "";
@@ -232,6 +233,21 @@ ul, ol { list-style: none; padding: 0; }
 }
 .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 .nav-cta { display: none; margin-left: 0.4rem; padding: 0.65rem 1.4rem; }
+/* Ícono de la red principal (Instagram), junto al botón de reservar o al menú del celular */
+.nav-red {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink-soft);
+  transition: color 0.3s var(--ease-out), background 0.3s var(--ease-out);
+}
+.nav-red:hover { color: var(--accent); background: rgba(111, 107, 63, 0.1); }
+.nav-red ~ .nav-burger { margin-left: -1.4rem; }
 .nav-burger {
   margin-left: auto;
   display: inline-flex;
@@ -250,8 +266,15 @@ ul, ol { list-style: none; padding: 0; }
 
 @media (min-width: 960px) {
   .nav-links { display: flex; }
+  .nav-red { margin-left: -0.9rem; }
   .nav-cta { display: inline-flex; }
   .nav-burger { display: none; }
+}
+/* Pantallas medianas: menos espacio entre enlaces para que todo quepa en una línea */
+@media (min-width: 960px) and (max-width: 1199px) {
+  .nav-inner { gap: 1.1rem; }
+  .nav-links { gap: 1.15rem; }
+  .nav-red { margin-left: -0.4rem; }
 }
 @media (max-width: 959px) {
   .nav.is-open { background: var(--bg); box-shadow: 0 1px 0 var(--line); }
@@ -1049,6 +1072,45 @@ ul, ol { list-style: none; padding: 0; }
   letter-spacing: 0.06em;
   color: rgba(255, 253, 248, 0.65);
 }
+.cta-redes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.8rem;
+}
+.cta-redes-titulo {
+  flex-basis: 100%;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.cta-redes a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 253, 248, 0.35);
+  border-radius: 999px;
+  color: rgba(255, 253, 248, 0.92);
+  transition: background 0.35s var(--ease-out), border-color 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.cta-redes a:hover { background: rgba(255, 253, 248, 0.14); border-color: rgba(255, 253, 248, 0.7); transform: translateY(-2px); }
+/* La red principal muestra su @usuario */
+.cta-redes a.red-usuario,
+.footer-social a.red-usuario {
+  width: auto;
+  gap: 0.55rem;
+  padding: 0 1.1rem 0 0.9rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
 
 /* =============================================================
    15. Footer
@@ -1089,6 +1151,7 @@ ul, ol { list-style: none; padding: 0; }
 }
 .footer-social {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.7rem;
   margin-top: 1.3rem;
 }

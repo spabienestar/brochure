@@ -378,6 +378,31 @@ const ICONOS_REDES = {
 };
 const ZIGZAG = '<path d="M2 20 L18 4 L34 20 L50 4 L66 20 L82 4 L98 20 L114 4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
 
+// Redes sociales en el orden en que se muestran. La primera que tenga enlace es la principal:
+// aparece en la barra de arriba y, en el cierre y el pie de página, con su @usuario.
+const REDES = ["instagram", "facebook", "tiktok"];
+const NOMBRE_RED = { instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok" };
+
+// "@usuario" de un enlace de Instagram o TikTok; vacío si el enlace no lo dice (por ejemplo, en Facebook).
+function usuarioRed(red, url) {
+  let u;
+  try { u = new URL(url); } catch (_) { return ""; }
+  const parte = u.pathname.split("/").filter(Boolean)[0] || "";
+  if (red === "instagram" && /^[\w.]{1,30}$/.test(parte) && !/^(p|reel|reels|tv|stories|explore)$/i.test(parte)) return "@" + parte;
+  if (red === "tiktok" && /^@[\w.]{1,30}$/.test(parte)) return parte;
+  return "";
+}
+const iconoRed = (red, tamano) => '<svg viewBox="0 0 24 24" width="' + tamano + '" height="' + tamano + '" aria-hidden="true">' + ICONOS_REDES[red] + "</svg>";
+
+// Un enlace por red: la principal con su @usuario, las demás solo con el ícono.
+function enlacesRedes(c, sangria) {
+  return REDES.filter((red) => c.contacto[red]).map((red, i) => {
+    const usuario = i === 0 ? usuarioRed(red, c.contacto[red]) : "";
+    return sangria + "<a" + (usuario ? ' class="red-usuario"' : "") + ' href="' + esc(c.contacto[red]) + '" target="_blank" rel="noopener" aria-label="' +
+      NOMBRE_RED[red] + " de " + esc(c.marca.nombre) + (usuario ? ": " + esc(usuario) : "") + '">' + iconoRed(red, 18) + (usuario ? "<span>" + esc(usuario) + "</span>" : "") + "</a>";
+  });
+}
+
 const titulo = (t, destacado, salto) => esc(t) + (destacado ? (salto ? "<br />" : " ") + "<em>" + esc(destacado) + "</em>" : "");
 
 // Fotos y videos de un servicio. Miniatura (listas) o portada deslizable (tarjetas).
@@ -461,9 +486,12 @@ function renderizar(c) {
   );
   for (const k of visibles) L.push('        <a href="#' + k + '">' + esc(c[k].menu) + "</a>");
   if (hayVideos) L.push('        <a href="#videos">' + esc(c.videos.menu) + "</a>");
+  L.push('        <a href="#contacto">Contacto</a>', "      </nav>");
+  const principal = REDES.find((red) => ct[red]);
+  if (principal) {
+    L.push('      <a class="nav-red" href="' + esc(ct[principal]) + '" target="_blank" rel="noopener" aria-label="' + NOMBRE_RED[principal] + " de " + esc(c.marca.nombre) + '">' + iconoRed(principal, 20) + "</a>");
+  }
   L.push(
-    '        <a href="#contacto">Contacto</a>',
-    "      </nav>",
     '      <a class="btn btn-primary nav-cta" href="' + esc(reservar) + '" target="_blank" rel="noopener">Reservar</a>',
     '      <button class="nav-burger" data-burger aria-label="Abrir menú" aria-expanded="false">',
     "        <span></span><span></span><span></span>",
@@ -736,11 +764,11 @@ function renderizar(c) {
   if (ct.whatsapp_2) L.push('          <a class="btn btn-outline-light" href="' + esc(enlaceWhatsapp(ct.whatsapp_2, ct.mensaje)) + '" target="_blank" rel="noopener">WhatsApp · ' + telefonoVisible(ct.whatsapp_2) + "</a>");
   L.push("        </div>");
   if (ct.horarios.length) L.push('        <p class="cta-schedule reveal">' + ct.horarios.map((h) => esc(horarioCorto(h))).join(" &nbsp;·&nbsp; ") + "</p>");
+  const redes = enlacesRedes(c, "          ");
+  if (redes.length) L.push('        <div class="cta-redes reveal">', '          <p class="cta-redes-titulo">Síguenos</p>', ...redes, "        </div>");
   L.push("      </div>", "    </section>", "  </main>");
 
   // Pie de página
-  const redes = ["instagram", "facebook", "tiktok"].filter((red) => ct[red]);
-  const nombreRed = { instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok" };
   L.push(
     "",
     "  <!-- ============================ FOOTER ============================ -->",
@@ -752,17 +780,7 @@ function renderizar(c) {
     '        <p class="footer-tag">' + esc(c.marca.lema.charAt(0).toUpperCase() + c.marca.lema.slice(1)) + "</p>"
   );
   if (c.marca.mision) L.push('        <p class="footer-mission">' + parrafo(c.marca.mision) + "</p>");
-  if (redes.length) {
-    L.push('        <div class="footer-social">');
-    for (const red of redes) {
-      L.push(
-        '          <a href="' + esc(ct[red]) + '" target="_blank" rel="noopener" aria-label="' + nombreRed[red] + " de " + esc(c.marca.nombre) + '">',
-        '            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' + ICONOS_REDES[red] + "</svg>",
-        "          </a>"
-      );
-    }
-    L.push("        </div>");
-  }
+  if (redes.length) L.push('        <div class="footer-social">', ...redes, "        </div>");
   L.push(
     "      </div>",
     '      <div class="footer-col">',
@@ -807,6 +825,6 @@ function renderizar(c) {
 }
 
 // Versión de styles.css y main.js (cambiarla cuando cambien esos archivos, para que los navegadores los recarguen).
-const VERSION_ARCHIVOS = "2026102201";
+const VERSION_ARCHIVOS = "2026102801";
 
 module.exports = { ESQUEMA, CAMPOS_SERVICIO, SECCIONES_SERVICIOS, MAX_FOTOS_SERVICIO, MAX_SERVICIOS, MAX_VIDEOS, validar, renderizar, rutasDeFotos, analizarVideo, slug };
